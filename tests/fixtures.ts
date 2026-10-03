@@ -9,7 +9,7 @@
 
 import type { DonneesColonne, Section } from '../src/index';
 
-export const SECTION_400: Section = { forme: 'rectangulaire', b: 400, h: 400, enrobageAxe: 50, nb: 3, nh: 3, phi: 20 };
+export const SECTION_400: Extract<Section, { forme: 'rectangulaire' }> = { forme: 'rectangulaire', b: 400, h: 400, enrobageAxe: 50, nb: 3, nh: 3, phi: 20 };
 
 export function poteau(modifs: Partial<DonneesColonne> = {}): DonneesColonne {
   return {
