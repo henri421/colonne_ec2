@@ -4,7 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig({
   root: 'app',
   // Chemins relatifs : la page est servie depuis un sous-chemin sur GitHub
-  // Pages (/colonne-ec2/), pas depuis la racine d'un domaine.
+  // Pages (/colonne_ec2/), pas depuis la racine d'un domaine.
   base: './',
   build: {
     outDir: '../docs',

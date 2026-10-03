@@ -5,7 +5,7 @@ Poteaux en béton armé selon l'EN 1992-1-1 : **flambement et effets du second o
 déviée**.
 
 Fait partie de la suite [Aedificium web](https://henri421.github.io/WebAedificium/).
-Page publiée : <https://henri421.github.io/colonne-ec2/>.
+Page publiée : <https://henri421.github.io/colonne_ec2/>.
 
 > **Aide au calcul. L'outil constate, il ne prescrit pas** : il rend des moments de
 > calcul et des taux de travail, jamais un ferraillage. Valeurs recommandées, sans
