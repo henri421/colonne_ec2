@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="theme-color" content="#f7f7f6" />
+    <link rel="icon" href="./icone.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icone-192.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>colonne-ec2 — poteaux, flambement et second ordre, EN 1992-1-1 §5.8</title>
+  </head>
+  <body>
+    <nav class="barre" aria-label="suite d'outils">
+      <div class="barre-corps">
+        <span class="barre-nom">Aedificium &middot; Beton arme</span>
+        <a class="barre-lien" href="https://henri421.github.io/WebAedificium/" target="_blank" rel="noopener">Suite Aedificium &#8599;</a>
+      </div>
+    </nav>
+
+    <header>
+      <h1>colonne-ec2</h1>
+      <p class="sous-titre">
+        Poteau en beton arme : flambement et effets du second ordre (EN 1992-1-1 §5.8, courbure nominale ou rigidite
+        nominale), analyse P-&Delta; iterative, resistance de la section a l'ELU et flexion deviee.
+      </p>
+      <p class="avertissement">
+        Aide au calcul : l'outil constate, il ne prescrit pas. Valeurs recommandees, sans annexe nationale. Element
+        isole ; les effets globaux du second ordre d'une structure ne sont pas traites.
+      </p>
+    </header>
+
+    <main>
+      <section id="saisie" aria-label="saisie">
+        <form id="formulaire" autocomplete="off">
+          <fieldset>
+            <legend>Section</legend>
+            <label><span>Forme</span>
+              <select data-champ="forme">
+                <option value="rectangulaire">rectangulaire</option>
+                <option value="circulaire">circulaire</option>
+              </select>
+            </label>
+            <div class="groupe" data-groupe="rectangulaire">
+              <label><span>b, selon y (mm)</span><input type="text" inputmode="decimal" data-champ="b" /></label>
+              <label><span>h, selon z (mm)</span><input type="text" inputmode="decimal" data-champ="h" /></label>
+              <label><span>Barres par face parallele a b</span><input type="text" inputmode="decimal" data-champ="nb" /></label>
+              <label><span>Barres par face parallele a h</span><input type="text" inputmode="decimal" data-champ="nh" /></label>
+            </div>
+            <div class="groupe" data-groupe="circulaire">
+              <label><span>D (mm)</span><input type="text" inputmode="decimal" data-champ="D" /></label>
+              <label><span>Nombre de barres</span><input type="text" inputmode="decimal" data-champ="n" /></label>
+            </div>
+            <label><span>&phi; des barres (mm)</span><input type="text" inputmode="decimal" data-champ="phi" /></label>
+            <label><span>d', parement a l'axe des barres (mm)</span><input type="text" inputmode="decimal" data-champ="enrobage" /></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Materiaux et effort</legend>
+            <label><span>f<sub>ck</sub> (MPa)</span><input type="text" inputmode="decimal" data-champ="fck" /></label>
+            <label><span>f<sub>yk</sub> (MPa)</span><input type="text" inputmode="decimal" data-champ="fyk" /></label>
+            <label><span>Longueur libre l (m)</span><input type="text" inputmode="decimal" data-champ="l" /></label>
+            <label><span>N<sub>Ed</sub>, compression (kN)</span><input type="text" inputmode="decimal" data-champ="ned" /></label>
+            <label><span>m, elements contribuant (§5.2(5))</span><input type="text" inputmode="decimal" data-champ="m" /></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Fluage et methode</legend>
+            <label><span>&phi;(&infin;, t<sub>0</sub>) (-)</span><input type="text" inputmode="decimal" data-champ="phi_inf" /></label>
+            <label><span>M<sub>0Eqp</sub> / M<sub>0Ed</sub> (-)</span><input type="text" inputmode="decimal" data-champ="rapport" /></label>
+            <label><span>Methode</span>
+              <select data-champ="methode">
+                <option value="courbure-nominale">courbure nominale (§5.8.8)</option>
+                <option value="rigidite-nominale">rigidite nominale (§5.8.7)</option>
+              </select>
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Flexion autour de y (dimension h)</legend>
+            <label><span>Longueur efficace l<sub>0</sub></span>
+              <select data-champ="y_l0_mode">
+                <option value="calculee">calculee (§5.8.3.2)</option>
+                <option value="saisie">saisie</option>
+              </select>
+            </label>
+            <div class="groupe" data-groupe="y-l0-saisie">
+              <label><span>l<sub>0</sub> (m)</span><input type="text" inputmode="decimal" data-champ="y_l0" /></label>
+            </div>
+            <div class="groupe" data-groupe="y-l0-calculee">
+              <label><span>Element</span>
+                <select data-champ="y_contreventement">
+                  <option value="contrevente">contrevente</option>
+                  <option value="non-contrevente">non contrevente</option>
+                </select>
+              </label>
+              <label><span>Tete</span>
+                <select data-champ="y_tete">
+                  <option value="articule">articulee</option>
+                  <option value="encastre">encastree (k = 0,1)</option>
+                  <option value="souple">souplesse k saisie</option>
+                </select>
+              </label>
+              <div class="groupe" data-groupe="y-k-tete">
+                <label><span>k tete (-)</span><input type="text" inputmode="decimal" data-champ="y_k_tete" /></label>
+              </div>
+              <label><span>Pied</span>
+                <select data-champ="y_pied">
+                  <option value="articule">articule</option>
+                  <option value="encastre">encastre (k = 0,1)</option>
+                  <option value="souple">souplesse k saisie</option>
+                </select>
+              </label>
+              <div class="groupe" data-groupe="y-k-pied">
+                <label><span>k pied (-)</span><input type="text" inputmode="decimal" data-champ="y_k_pied" /></label>
+              </div>
+            </div>
+            <label><span>Moments du premier ordre</span>
+              <select data-champ="y_origine">
+                <option value="extremites">moments d'extremite</option>
+                <option value="transversales">charges transversales</option>
+              </select>
+            </label>
+            <div class="groupe" data-groupe="y-extremites">
+              <label><span>M tete (kN.m)</span><input type="text" inputmode="decimal" data-champ="y_m_tete" /></label>
+              <label><span>M pied (kN.m), meme signe = simple courbure</span><input type="text" inputmode="decimal" data-champ="y_m_pied" /></label>
+            </div>
+            <div class="groupe" data-groupe="y-transversales">
+              <label><span>M<sub>0</sub> maximal (kN.m)</span><input type="text" inputmode="decimal" data-champ="y_m0" /></label>
+              <label><span>Distribution</span>
+                <select data-champ="y_distribution">
+                  <option value="parabolique">parabolique (c0 = 9,6)</option>
+                  <option value="triangulaire">triangulaire (c0 = 12)</option>
+                  <option value="constante">constante (c0 = 8)</option>
+                </select>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Flexion autour de z (dimension b)</legend>
+            <label><span>Longueur efficace l<sub>0</sub></span>
+              <select data-champ="z_l0_mode">
+                <option value="calculee">calculee (§5.8.3.2)</option>
+                <option value="saisie">saisie</option>
+              </select>
+            </label>
+            <div class="groupe" data-groupe="z-l0-saisie">
+              <label><span>l<sub>0</sub> (m)</span><input type="text" inputmode="decimal" data-champ="z_l0" /></label>
+            </div>
+            <div class="groupe" data-groupe="z-l0-calculee">
+              <label><span>Element</span>
+                <select data-champ="z_contreventement">
+                  <option value="contrevente">contrevente</option>
+                  <option value="non-contrevente">non contrevente</option>
+                </select>
+              </label>
+              <label><span>Tete</span>
+                <select data-champ="z_tete">
+                  <option value="articule">articulee</option>
+                  <option value="encastre">encastree (k = 0,1)</option>
+                  <option value="souple">souplesse k saisie</option>
+                </select>
+              </label>
+              <div class="groupe" data-groupe="z-k-tete">
+                <label><span>k tete (-)</span><input type="text" inputmode="decimal" data-champ="z_k_tete" /></label>
+              </div>
+              <label><span>Pied</span>
+                <select data-champ="z_pied">
+                  <option value="articule">articule</option>
+                  <option value="encastre">encastre (k = 0,1)</option>
+                  <option value="souple">souplesse k saisie</option>
+                </select>
+              </label>
+              <div class="groupe" data-groupe="z-k-pied">
+                <label><span>k pied (-)</span><input type="text" inputmode="decimal" data-champ="z_k_pied" /></label>
+              </div>
+            </div>
+            <label><span>Moments du premier ordre</span>
+              <select data-champ="z_origine">
+                <option value="extremites">moments d'extremite</option>
+                <option value="transversales">charges transversales</option>
+              </select>
+            </label>
+            <div class="groupe" data-groupe="z-extremites">
+              <label><span>M tete (kN.m)</span><input type="text" inputmode="decimal" data-champ="z_m_tete" /></label>
+              <label><span>M pied (kN.m), meme signe = simple courbure</span><input type="text" inputmode="decimal" data-champ="z_m_pied" /></label>
+            </div>
+            <div class="groupe" data-groupe="z-transversales">
+              <label><span>M<sub>0</sub> maximal (kN.m)</span><input type="text" inputmode="decimal" data-champ="z_m0" /></label>
+              <label><span>Distribution</span>
+                <select data-champ="z_distribution">
+                  <option value="parabolique">parabolique (c0 = 9,6)</option>
+                  <option value="triangulaire">triangulaire (c0 = 12)</option>
+                  <option value="constante">constante (c0 = 8)</option>
+                </select>
+              </label>
+            </div>
+          </fieldset>
+
+          <p data-role="erreur-saisie" class="erreur" role="alert" hidden></p>
+        </form>
+      </section>
+
+      <div class="colonne">
+        <section id="resultat" aria-label="resultat">
+          <h2>Resultat</h2>
+          <p data-role="erreur" class="erreur" role="alert" hidden></p>
+          <div data-role="avertissements"></div>
+          <div data-role="verdict"></div>
+          <div class="dessins">
+            <div data-role="section"></div>
+            <div data-role="interaction"></div>
+          </div>
+        </section>
+
+        <section id="directions" aria-label="detail par direction">
+          <h2>Second ordre et section, par direction</h2>
+          <div class="deux">
+            <div><h3>Autour de y (dimension h)</h3><div data-role="dir-y"></div></div>
+            <div><h3>Autour de z (dimension b)</h3><div data-role="dir-z"></div></div>
+          </div>
+        </section>
+
+        <section id="pdelta" aria-label="analyse P-delta">
+          <h2>Analyse P-&Delta; iterative</h2>
+          <p class="note">Barre biarticulee equivalente de longueur l<sub>0</sub>, rigidite nominale EI, moment du premier ordre M<sub>0Ed</sub> : la fleche est recalculee jusqu'a stabilisation. Recoupement numerique des methodes simplifiees, pas une analyse de structure.</p>
+          <div class="deux">
+            <div><h3>Autour de y</h3><div data-role="pd-y"></div></div>
+            <div><h3>Autour de z</h3><div data-role="pd-z"></div></div>
+          </div>
+        </section>
+
+        <section id="devie" aria-label="flexion deviee">
+          <h2>Flexion deviee (§5.8.9)</h2>
+          <div data-role="devie"></div>
+        </section>
+
+        <section id="sorties" aria-label="sorties">
+          <h2>Sorties</h2>
+          <div class="boutons">
+            <button type="button" data-action="exporter-dessins">Dessins (SVG)</button>
+            <button type="button" data-action="exporter-resultats">Resultats (CSV)</button>
+            <button type="button" data-action="exporter-note">Note de calcul (HTML imprimable)</button>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      <p>
+        Hors perimetre : methode generale (§5.8.6) ; effets globaux du second ordre des structures (§5.8.3.3) ;
+        sections non rectangulaires ni circulaires ; poteaux de section variable ; precontrainte ; dispositions
+        constructives des poteaux (§9.5) ; flambement par deversement.
+      </p>
+    </footer>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
