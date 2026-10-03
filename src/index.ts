@@ -24,5 +24,5 @@ export {
 export { momentResistant, efforts, compressionMaximale, tractionMaximale, NRdDevie, type EtatSection } from './section/resistance';
 export { longueurEfficace, elancementLimite, momentsOrdonnes } from './second-ordre/longueur-et-elancement';
 export { imperfection, excentriciteMinimale, fluageEffectif, MM_PAR_M } from './second-ordre/imperfections-et-fluage';
-export { courbureNominale, rigiditeNominale, coefficientC0, pDelta, type FormeMoment } from './second-ordre/methodes';
+export { courbureNominale, rigiditeNominale, coefficientC0, facteurCourbure, C_COURBURE_MOMENT_CONSTANT, pDelta, type FormeMoment } from './second-ordre/methodes';
 export { verifierColonne, exposantDevie } from './second-ordre/verifier-colonne';

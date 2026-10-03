@@ -17,11 +17,18 @@ export type Maintien =
       k: number;
     };
 
+export type Contreventement = 'contrevente' | 'non-contrevente';
+
+/**
+ * Le contreventement est exige MEME quand l_0 est saisi : il decide de C
+ * (§5.8.3.1(1)) et du moment equivalent (§5.8.8.2(2)). Le supposer
+ * contrevente faute de mieux serait non conservatif.
+ */
 export type DonneesLongueur =
-  | { mode: 'saisie'; l0: number }
+  | { mode: 'saisie'; l0: number; contreventement: Contreventement }
   | {
       mode: 'calculee';
-      contreventement: 'contrevente' | 'non-contrevente';
+      contreventement: Contreventement;
       tete: Maintien;
       pied: Maintien;
     };

@@ -56,3 +56,13 @@ courbure nominale : 80,73 / 269,90 = 0,299.
 Les deux méthodes simplifiées donnent ici 80,7 et 47,0 kN·m. Elles ne sont pas censées
 coïncider : la courbure nominale est connue pour être plus sévère sur les poteaux peu
 élancés et fortement comprimés.
+
+## Variantes (corrections du 3 octobre 2026)
+
+- **Autour de y, élément non contreventé** (l₀ = 4 m saisi) : C = 0,7 imposé, λ_lim = **20,41**
+  < 34,64 ; M_0Ed = M_02 = 75 kN·m (le moment équivalent M_0e = 39 kN·m n'est employé que pour
+  un élément contreventé, le moment du second ordre étant sinon maximal à l'extrémité) ;
+  M_Ed = 75 + 45,73 = **120,73 kN·m**.
+- **Autour de z, charge transversale à moment constant** M_0 = 20 kN·m : c = 8 (§5.8.8.2(4)),
+  e₂ = 30,48 × 10 / 8 = 38,10 mm, M₂ = **57,16 kN·m**. En distribution parabolique, c = 10 et
+  M₂ = 45,73 kN·m.

@@ -24,7 +24,7 @@ describe('saisie', () => {
     if (!l.ok) throw new Error(l.message);
     const d = donneesDepuisModele(l.modele);
     expect(d.l).toBe(3500);
-    expect(d.y.longueur).toEqual({ mode: 'saisie', l0: 2800 });
+    expect(d.y.longueur).toEqual({ mode: 'saisie', l0: 2800, contreventement: 'contrevente' });
   });
 
   it('le modele par defaut se calcule', () => {
@@ -49,7 +49,7 @@ describe('vues et dessins', () => {
   });
 
   it('un instable s ecrit « instable », jamais Infinity', () => {
-    const ri = verifierColonne(poteau({ methode: 'rigidite-nominale', z: { longueur: { mode: 'saisie', l0: 16000 }, moments: { origine: 'extremites', M_tete: 20, M_pied: 20 } } }), P);
+    const ri = verifierColonne(poteau({ methode: 'rigidite-nominale', z: { longueur: { mode: 'saisie', l0: 16000, contreventement: 'contrevente' }, moments: { origine: 'extremites', M_tete: 20, M_pied: 20 } } }), P);
     const texte = JSON.stringify(blocs(ri));
     expect(texte).toContain('instable');
     expect(texte).not.toContain('Infinity');

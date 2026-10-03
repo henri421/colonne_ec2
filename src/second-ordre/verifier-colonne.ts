@@ -19,7 +19,7 @@ import { aireAcier, aireBeton, hauteurFlexion, hauteurUtileCourbure, inertieAcie
 import { NRdDevie, compressionMaximale, momentResistant } from '../section/resistance';
 import { elancementLimite, longueurEfficace, momentsOrdonnes } from './longueur-et-elancement';
 import { excentriciteMinimale, fluageEffectif, imperfection } from './imperfections-et-fluage';
-import { coefficientC0, courbureNominale, pDelta, rigiditeNominale, type FormeMoment } from './methodes';
+import { coefficientC0, courbureNominale, facteurCourbure, pDelta, rigiditeNominale, type FormeMoment } from './methodes';
 
 interface Contexte {
   d: DonneesColonne;
@@ -53,6 +53,7 @@ function direction(ctx: Contexte, axe: Axe, dd: DonneesDirection, avecImperfecti
   const e_0 = excentriciteMinimale(H);
   const Mmin = (NEd * e_0) / 1000;
 
+  const contrevente = dd.longueur.contreventement === 'contrevente';
   let M01 = 0;
   let M02 = 0;
   let M0Ed: number;
@@ -64,7 +65,10 @@ function direction(ctx: Contexte, axe: Axe, dd: DonneesDirection, avecImperfecti
     M02 = o.M02 + Mi;
     M01 = o.M01 + Mi;
     // Moment equivalent, §5.8.8.2(2) : M_0e = 0,6 M_02 + 0,4 M_01 >= 0,4 M_02.
-    M0Ed = Math.max(0.6 * M02 + 0.4 * M01, 0.4 * M02);
+    // Element contrevente seulement : non contrevente, le moment du second
+    // ordre est maximal a l'extremite, comme M_02, et M_0e serait non
+    // conservatif.
+    M0Ed = contrevente ? Math.max(0.6 * M02 + 0.4 * M01, 0.4 * M02) : M02;
     forme = 'constante';
   } else {
     M0premier = Math.abs(dd.moments.M_0);
@@ -73,7 +77,6 @@ function direction(ctx: Contexte, axe: Axe, dd: DonneesDirection, avecImperfecti
   }
 
   const fl = fluageEffectif(d.phi_inf, d.rapportQuasiPermanent, lambda, Math.max(M0premier, Mmin), NEd, H);
-  const contrevente = dd.longueur.mode === 'saisie' || dd.longueur.contreventement === 'contrevente';
   const lim = elancementLimite(fl.phi_ef, omega, n, dd.moments, contrevente);
   const negligeable = lambda <= lim.lambda_lim;
 
@@ -109,7 +112,7 @@ function direction(ctx: Contexte, axe: Axe, dd: DonneesDirection, avecImperfecti
   if (dd.moments.origine === 'extremites') candidats.push([M02, 'moment d extremite M_02 + N e_i']);
 
   if (negligeable) {
-    candidats.push([M0Ed, dd.moments.origine === 'extremites' ? 'M_0e + N e_i, second ordre negligeable' : 'M_0 + N e_i, second ordre negligeable']);
+    candidats.push([M0Ed, dd.moments.origine === 'transversales' ? 'M_0 + N e_i, second ordre negligeable' : contrevente ? 'M_0e + N e_i, second ordre negligeable' : 'M_02 + N e_i, second ordre negligeable']);
   } else if (d.methode === 'courbure-nominale') {
     courbure = courbureNominale({
       fyd: f_yd,
@@ -120,10 +123,10 @@ function direction(ctx: Contexte, axe: Axe, dd: DonneesDirection, avecImperfecti
       lambda,
       phi_ef: fl.phi_ef,
       l0,
-      c: profil.c_courbure.valeur,
+      c: facteurCourbure(dd.moments, profil.c_courbure.valeur),
       NEd,
     });
-    candidats.push([M0Ed + courbure.M_2, 'M_0Ed + M_2, courbure nominale (5.31)']);
+    candidats.push([M0Ed + courbure.M_2, `M_0Ed + M_2, courbure nominale (5.31), c = ${fr(facteurCourbure(dd.moments, profil.c_courbure.valeur), 0)}`]);
   } else {
     if (rig === null) throw new Error(motifRig);
     rigidite = { EI: rig.EI, N_B: rig.N_B, beta: rig.beta, amplification: rig.amplification };

@@ -14,14 +14,15 @@ Page publiée : <https://henri421.github.io/colonne_ec2/>.
 ## Ce que l'outil rend, pour chaque direction
 
 - **Longueur efficace** (§5.8.3.2), contreventé ou non, à partir des souplesses
-  d'extrémité ; un encastrement est compté avec k = 0,1, **avertissement à l'appui** ; ou l₀ saisi.
+  d'extrémité ; un encastrement est compté avec k = 0,1, **avertissement à l'appui** ; ou l₀ saisi — le contreventement reste alors **exigé**, car il décide de C et du moment équivalent.
 - **Élancement limite** (§5.8.3.1) : A, B, C avec leur origine. L'origine des moments est
   **exigée** : des charges transversales ou un élément non contreventé **imposent C = 0,7**,
   et r_m n'est alors pas employé.
 - **Imperfections** (§5.2) avec α_h calculé en mètres, **excentricité minimale** (§6.1(4)).
 - **Fluage effectif** (§5.8.4) : les trois conditions de dispense sont testées, celle qui
   manque est nommée.
-- **Courbure nominale** (§5.8.8) ou **rigidité nominale** (§5.8.7), au choix. N_Ed ≥ N_B rend
+- **Courbure nominale** (§5.8.8) ou **rigidité nominale** (§5.8.7), au choix. Moment équivalent
+  M_0e pour un élément **contreventé** seulement (sinon M_02) ; c = 8 sous moment constant. N_Ed ≥ N_B rend
   un verdict **instable**, jamais un nombre aberrant.
 - **P-Δ itérative** : barre biarticulée équivalente de longueur l₀, rigidité nominale, flèche
   recalculée jusqu'à stabilisation — recoupement numérique des méthodes simplifiées.

@@ -221,7 +221,7 @@ function direction(s: SaisieDirection): DonneesDirection {
   return {
     longueur:
       s.l0Mode === 'saisie'
-        ? { mode: 'saisie', l0: s.l0 * MM_PAR_M }
+        ? { mode: 'saisie', l0: s.l0 * MM_PAR_M, contreventement: s.contreventement }
         : { mode: 'calculee', contreventement: s.contreventement, tete: maintien(s.tete, s.kTete), pied: maintien(s.pied, s.kPied) },
     moments:
       s.origine === 'extremites'

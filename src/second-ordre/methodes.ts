@@ -8,7 +8,7 @@
 
 import { E_S } from '../materiaux/materiaux';
 import { exigerPositif } from '../norms/profil';
-import type { PDelta } from '../domaines/resultat';
+import type { MomentsPremierOrdre, PDelta } from '../domaines/resultat';
 
 const N_PAR_KN = 1000;
 const NMM_PAR_KNM = 1e6;
@@ -55,6 +55,20 @@ export function courbureNominale(p: {
   const inv_r = K_r * K_phi * inv_r0;
   const e_2 = (inv_r * p.l0 * p.l0) / p.c;
   return { K_r, K_phi, inv_r, e_2, M_2: (p.NEd * e_2) / 1000 };
+}
+
+/** Borne basse de c, moment total constant, §5.8.8.2(4). */
+export const C_COURBURE_MOMENT_CONSTANT = 8;
+
+/**
+ * Facteur c de e_2 = (1/r) l_0^2 / c, §5.8.8.2(4) : la valeur du profil (10)
+ * en general ; 8 pour un moment du premier ordre constant le long de la
+ * barre (charges transversales a distribution constante). Les moments
+ * d'extremite, remplaces par M_0e, gardent la valeur du profil, comme la
+ * pratique courante.
+ */
+export function facteurCourbure(moments: MomentsPremierOrdre, cProfil: number): number {
+  return moments.origine === 'transversales' && moments.distribution === 'constante' ? Math.min(cProfil, C_COURBURE_MOMENT_CONSTANT) : cProfil;
 }
 
 /** c_0 de l'expression (5.29), selon la distribution du moment du premier ordre. */

@@ -72,7 +72,7 @@ describe('verifierColonne, cas particuliers', () => {
     const r = verifierColonne(
       poteau({
         methode: 'rigidite-nominale',
-        z: { longueur: { mode: 'saisie', l0: 16000 }, moments: { origine: 'extremites', M_tete: 20, M_pied: 20 } },
+        z: { longueur: { mode: 'saisie', l0: 16000, contreventement: 'contrevente' }, moments: { origine: 'extremites', M_tete: 20, M_pied: 20 } },
       }),
       P
     );
@@ -84,7 +84,7 @@ describe('verifierColonne, cas particuliers', () => {
   it('excentricite minimale : petits moments -> M_Ed >= N e_0', () => {
     const r = verifierColonne(
       poteau({
-        y: { longueur: { mode: 'saisie', l0: 2000 }, moments: { origine: 'extremites', M_tete: 0, M_pied: 0 } },
+        y: { longueur: { mode: 'saisie', l0: 2000, contreventement: 'contrevente' }, moments: { origine: 'extremites', M_tete: 0, M_pied: 0 } },
       }),
       P
     );
@@ -94,8 +94,8 @@ describe('verifierColonne, cas particuliers', () => {
   it('flexion deviee dispensee quand une excentricite domine', () => {
     const r = verifierColonne(
       poteau({
-        y: { longueur: { mode: 'saisie', l0: 3000 }, moments: { origine: 'extremites', M_tete: 200, M_pied: 200 } },
-        z: { longueur: { mode: 'saisie', l0: 3000 }, moments: { origine: 'extremites', M_tete: 0, M_pied: 0 } },
+        y: { longueur: { mode: 'saisie', l0: 3000, contreventement: 'contrevente' }, moments: { origine: 'extremites', M_tete: 200, M_pied: 200 } },
+        z: { longueur: { mode: 'saisie', l0: 3000, contreventement: 'contrevente' }, moments: { origine: 'extremites', M_tete: 0, M_pied: 0 } },
       }),
       P
     );
@@ -112,5 +112,46 @@ describe('verifierColonne, cas particuliers', () => {
 
   it('N_Ed nul ou negatif : refuse', () => {
     expect(() => verifierColonne(poteau({ N_Ed: 0 }), P)).toThrow('N_Ed');
+  });
+});
+
+describe('contreventement, moment equivalent et facteur c (corrections du 2026-10-03)', () => {
+  const nonContrevente = { mode: 'saisie' as const, l0: 4000, contreventement: 'non-contrevente' as const };
+
+  it('l_0 saisi, element non contrevente : C = 0,7 impose, meme avec r_m = -0,5', () => {
+    const r = verifierColonne(poteau({ y: { longueur: nonContrevente, moments: { origine: 'extremites', M_tete: 60, M_pied: -30 } } }), P);
+    expect(r.y.C).toBeCloseTo(0.7, 10);
+    expect(r.y.origines.C).toBe('impose-par-la-norme');
+    // 20 x 0,7692 x 1,2973 x 0,7 / sqrt(0,46875) = 20,41 < 34,64
+    expect(r.y.lambda_lim).toBeCloseTo(20.406, 2);
+    expect(r.y.negligeable).toBe(false);
+  });
+
+  it('non contrevente : M_0Ed = M_02 = 75 (et non M_0e = 39), M_Ed = 75 + 45,73 = 120,73 kN.m', () => {
+    const r = verifierColonne(poteau({ y: { longueur: nonContrevente, moments: { origine: 'extremites', M_tete: 60, M_pied: -30 } } }), P);
+    expect(r.y.M_0Ed).toBeCloseTo(75, 6);
+    expect(r.y.courbure?.M_2).toBeCloseTo(45.726, 2);
+    expect(r.y.M_Ed).toBeCloseTo(120.726, 2);
+  });
+
+  it('contrevente : M_0e conserve (35 kN.m autour de z)', () => {
+    expect(verifierColonne(poteau(), P).z.M_0Ed).toBeCloseTo(35, 6);
+  });
+
+  it('charge transversale a moment constant : c = 8, M_2 = 45,73 x 10 / 8 = 57,16 kN.m', () => {
+    const r = verifierColonne(
+      poteau({ z: { longueur: { mode: 'saisie', l0: 4000, contreventement: 'contrevente' }, moments: { origine: 'transversales', M_0: 20, distribution: 'constante' } } }),
+      P
+    );
+    expect(r.z.courbure?.M_2).toBeCloseTo(57.158, 2);
+    expect(r.z.origineMEd).toContain('c = 8');
+  });
+
+  it('charge transversale parabolique : c = 10 conserve', () => {
+    const r = verifierColonne(
+      poteau({ z: { longueur: { mode: 'saisie', l0: 4000, contreventement: 'contrevente' }, moments: { origine: 'transversales', M_0: 20, distribution: 'parabolique' } } }),
+      P
+    );
+    expect(r.z.courbure?.M_2).toBeCloseTo(45.726, 2);
   });
 });
