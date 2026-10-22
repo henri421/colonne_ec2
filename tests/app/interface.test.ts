@@ -5,7 +5,7 @@ import { JETONS, valeursDesJetons } from 'aedificium-ui';
 import { beton, ec2Recommande, fyd, verifierColonne } from '../../src/index';
 import { champsDepuisModele, donneesDepuisModele, modeleDepuisChamps, modeleParDefaut } from '../../app/src/form';
 import { courbeInteraction, dessinInteraction, dessinSection } from '../../app/src/dessins';
-import { blocs, lignesDirection, lignesPDelta } from '../../app/src/vue';
+import { blocs, lignesDirection, lignesPDelta, verdictHtml } from '../../app/src/vue';
 import { STYLES_TRACE, noteDeCalculHtml } from '../../app/src/export';
 import { SECTION_400, poteau } from '../fixtures';
 
@@ -78,5 +78,12 @@ describe('vues et dessins', () => {
   it('la note porte le titre du poteau', () => {
     const html = noteDeCalculHtml({ titre: 'P1', date: '2026-10-03', profil: P.nom, entrees: [], dessins: [], resultats: blocs(r), avertissements: [], hypotheses: [] }, STYLES_TRACE);
     expect(html).toContain('poteau en beton arme');
+  });
+
+  it('ecran et note portent le meme verdict : constat et N_Rd,max', () => {
+    const verdict = blocs(r).find((b) => b.titre === 'Verdict');
+    const ecran = verdictHtml(r);
+    for (const l of verdict?.lignes ?? []) expect(ecran).toContain(l.valeur);
+    expect(verdict?.lignes.map((l) => l.symbole)).toEqual(['constat', 'N_Rd,max']);
   });
 });

@@ -146,8 +146,12 @@ document.addEventListener('click', (ev) => {
   const action = cible.dataset.action;
   if (action === undefined || !action.startsWith('exporter-') || etat === null) return;
   const e = etat;
-  if (action === 'exporter-dessins') {
-    e.dessins.forEach((svg, i) => telecharger(`colonne-${i === 0 ? 'section' : 'interaction'}.svg`, svgAutonome(svg, STYLES_TRACE), 'image/svg+xml;charset=utf-8'));
+  // Un bouton par dessin : deux telechargements lances d'un meme clic, les
+  // navigateurs bloquent le second, et le diagramme N-M ne sortait pas.
+  if (action === 'exporter-section' || action === 'exporter-interaction') {
+    const i = action === 'exporter-section' ? 0 : 1;
+    const svg = e.dessins[i];
+    if (svg !== undefined) telecharger(`colonne-${i === 0 ? 'section' : 'interaction'}.svg`, svgAutonome(svg, STYLES_TRACE), 'image/svg+xml;charset=utf-8');
   } else if (action === 'exporter-resultats') {
     telecharger('colonne-resultats.csv', resultatsEnCsv([entrees(e.modele), ...blocs(e.resultat)]), 'text/csv;charset=utf-8');
   } else if (action === 'exporter-note') {

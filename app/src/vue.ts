@@ -75,6 +75,18 @@ export function lignesDevie(r: ResultatColonne): LigneResultat[] {
   ];
 }
 
+/**
+ * Le constat et la resistance en compression centree : les memes lignes a
+ * l'ecran (`verdictHtml`) et dans la note. La note taisait le constat, l'ecran
+ * taisait N_Rd,max.
+ */
+export function lignesVerdict(r: ResultatColonne): LigneResultat[] {
+  return [
+    L('constat', 'verdict', TITRES[r.verdict]),
+    L('N_Rd,max', 'compression centree', `${nombreFr(r.N_Rd_max, 0)} kN`),
+  ];
+}
+
 export function blocs(r: ResultatColonne): BlocResultat[] {
   return [
     { titre: 'Flexion autour de y (dimension h)', lignes: lignesDirection(r.y), note: null },
@@ -82,7 +94,7 @@ export function blocs(r: ResultatColonne): BlocResultat[] {
     { titre: 'Analyse P-delta, autour de y', lignes: lignesPDelta(r.y), note: null },
     { titre: 'Analyse P-delta, autour de z', lignes: lignesPDelta(r.z), note: null },
     { titre: 'Flexion deviee (§5.8.9)', lignes: lignesDevie(r), note: null },
-    { titre: 'Verdict', lignes: [L('N_Rd,max', 'compression centree', `${nombreFr(r.N_Rd_max, 0)} kN`)], note: r.motif },
+    { titre: 'Verdict', lignes: lignesVerdict(r), note: r.motif },
   ];
 }
 
@@ -95,5 +107,8 @@ export function tableHtml(lignes: readonly LigneResultat[]): string {
 const TITRES: Record<string, string> = { conforme: 'Conforme', 'non-conforme': 'Non conforme', instable: 'Instable' };
 
 export function verdictHtml(r: ResultatColonne): string {
-  return `<p class="verdict verdict-${echapper(r.verdict)}">${echapper(TITRES[r.verdict])}</p><p class="motif">${echapper(r.motif)}</p>`;
+  return (
+    `<p class="verdict verdict-${echapper(r.verdict)}">${echapper(TITRES[r.verdict])}</p><p class="motif">${echapper(r.motif)}</p>` +
+    tableHtml(lignesVerdict(r).slice(1))
+  );
 }
