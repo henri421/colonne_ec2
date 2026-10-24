@@ -7,7 +7,7 @@
  */
 
 import { E_S } from '../materiaux/materiaux';
-import { exigerPositif } from '../norms/profil';
+import { exigerPositif, fr } from '../norms/profil';
 import type { MomentsPremierOrdre, PDelta } from '../domaines/resultat';
 
 const N_PAR_KN = 1000;
@@ -111,7 +111,7 @@ export function rigiditeNominale(p: {
   NEd: number;
 }): Rigidite {
   if (p.rho < 0.002) {
-    throw new Error(`rho = ${(p.rho * 100).toFixed(2)} % < 0,2 % : la rigidite nominale du §5.8.7.2(2) ne s applique pas.`);
+    throw new Error(`rho = ${fr(p.rho * 100, 2)} % < 0,2 % : la rigidite nominale du §5.8.7.2(2) ne s applique pas.`);
   }
   const k1 = Math.sqrt(p.fck / 20);
   const k2 = Math.min(0.2, (p.n * p.lambda) / 170);
@@ -182,7 +182,7 @@ export function pDelta(M0: number, forme: FormeMoment, NEd: number, EI_kNm2: num
         iterations: it,
         M_max: Mmax,
         amplification: M0 === 0 ? 1 : Mmax / Math.abs(M0),
-        motif: `stabilisee en ${it} iterations, fleche ${(fleche * 1000).toFixed(1).replace('.', ',')} mm`,
+        motif: `stabilisee en ${it} iterations, fleche ${fr(fleche * 1000, 1)} mm`,
       };
     }
   }

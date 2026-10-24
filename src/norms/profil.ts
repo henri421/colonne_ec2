@@ -73,7 +73,31 @@ export function exigerPositifOuNul(valeur: number, nom: string, unite: string): 
   return valeur;
 }
 
-/** Nombre a la francaise pour les motifs affiches. */
+/** Retire les zeros de fin de la partie decimale, puis la virgule restee seule. */
+function sansZeros(texte: string): string {
+  return texte.includes(',') ? texte.replace(/,?0+$/, '') : texte;
+}
+
+/**
+ * Nombre a la francaise pour les motifs affiches : trois decimales au plus,
+ * sans zeros inutiles (« 1,5 » et non « 1,500 »), meme tiret qu'a l'ecran
+ * pour un NaN ou un infini.
+ */
 export function fr(x: number, d: number): string {
-  return x.toFixed(d).replace('.', ',');
+  if (!Number.isFinite(x)) return '—';
+  const texte = x.toFixed(Math.min(d, 3)).replace('.', ',');
+  return sansZeros(/^-0(,0*)?$/.test(texte) ? texte.slice(1) : texte);
+}
+
+/**
+ * Taux de travail affiche : meme arrondi VERS LE VERDICT que l'ecran (sous 1
+ * par defaut, par exces au-dessus), puis sans zeros inutiles. Un motif ne doit
+ * pas afficher « 1 » a cote d'un verdict defavorable.
+ */
+export function tauxFr(x: number, d = 3): string {
+  if (!Number.isFinite(x)) return 'hors domaine';
+  const decimales = Math.min(d, 3);
+  if (x === 1) return fr(1, decimales);
+  const f = 10 ** decimales;
+  return fr((x < 1 ? Math.floor(x * f) : Math.ceil(x * f)) / f, decimales);
 }

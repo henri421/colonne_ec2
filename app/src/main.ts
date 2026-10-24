@@ -4,7 +4,7 @@
  * `dessins` et `export`, tous purs.
  */
 
-import { blocsEnTexte, notationTexte, ouvrirOuTelecharger, resultatsEnCsv, svgAutonome, telecharger } from 'aedificium-ui';
+import { blocsEnTexte, nombreAffiche, notationTexte, ouvrirOuTelecharger, resultatsEnCsv, svgAutonome, telecharger } from 'aedificium-ui';
 import { beton, ec2Recommande, fyd, verifierColonne, type ResultatColonne } from '../../src/index';
 import { champsDepuisModele, donneesDepuisModele, modeleDepuisChamps, modeleParDefaut, sectionDepuisModele, type ModeleSaisie } from './form';
 import { courbeInteraction, dessinInteraction, dessinSection } from './dessins';
@@ -141,7 +141,7 @@ document.addEventListener('click', (ev) => {
       'colonne-note.html',
       noteDeCalculHtml(
         {
-          titre: `Poteau, N_Ed = ${e.modele.NEd} kN`,
+          titre: `Poteau, N_Ed = ${nombreAffiche(e.modele.NEd)} kN`,
           date: new Date().toISOString().slice(0, 10),
           profil: `${PROFIL.nom} (${PROFIL.date})`,
           entrees: [blocEntrees(e.modele)],

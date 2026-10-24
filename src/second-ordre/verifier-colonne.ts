@@ -12,7 +12,7 @@
 
 import type { DonneesColonne, DonneesDirection, ResultatColonne, ResultatDirection } from '../domaines/resultat';
 import type { ProfilEc2 } from '../norms/profil';
-import { exigerPositif, fr, verifierProfil } from '../norms/profil';
+import { exigerPositif, fr, tauxFr, verifierProfil } from '../norms/profil';
 import { beton, fyd as fydDe, type Beton } from '../materiaux/materiaux';
 import type { Axe } from '../section/geometrie';
 import { aireAcier, aireBeton, hauteurFlexion, hauteurUtileCourbure, inertieAcier, inertieBeton, rayonDeGiration } from '../section/geometrie';
@@ -244,7 +244,7 @@ export function verifierColonne(d: DonneesColonne, profil: ProfilEc2): ResultatC
   } else {
     const tauxMax = Math.max(y.taux, z.taux, devie.taux ?? 0);
     verdict = tauxMax <= 1 ? 'conforme' : 'non-conforme';
-    motif = `Taux maximal ${fr(tauxMax, 3)} : M_Ed / M_Rd = ${fr(y.taux, 3)} autour de y, ${fr(z.taux, 3)} autour de z${devie.taux === null ? '' : `, flexion deviee ${fr(devie.taux, 3)}`}.`;
+    motif = `Taux maximal ${tauxFr(tauxMax)} : M_Ed / M_Rd = ${tauxFr(y.taux)} autour de y, ${tauxFr(z.taux)} autour de z${devie.taux === null ? '' : `, flexion deviee ${tauxFr(devie.taux)}`}.`;
   }
   return { verdict, motif, methode: d.methode, N_Ed: d.N_Ed, N_Rd_max, y, z, devie, avertissements: ctx.avert };
 }
