@@ -421,3 +421,18 @@ h3 {
 
 .colonne { display: grid; gap: 1rem; min-width: 0; align-content: start; }
 fieldset.groupe[hidden] { display: none; }
+
+/* Une liste aux options longues ne sort pas de son cadre. */
+select {
+  max-width: 60%;
+}
+
+/* Sur un telephone, les intitules et valeurs longs passent a la ligne plutot
+   que d'elargir la page. */
+@media (max-width: 40rem) {
+  table.grandeurs th,
+  table.grandeurs td.valeur {
+    width: auto;
+    white-space: normal;
+  }
+}
