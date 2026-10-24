@@ -45,7 +45,7 @@ describe('vues et dessins', () => {
 
   it('P-delta sans objet quand le second ordre est negligeable', () => {
     expect(lignesPDelta(r.y)[0].valeur).toBe('non applicable');
-    expect(lignesPDelta(r.z)[0].valeur).toBe('stabilisee');
+    expect(lignesPDelta(r.z)[0].valeur).toBe('stabilisée');
   });
 
   it('un instable s ecrit « instable », jamais Infinity', () => {
