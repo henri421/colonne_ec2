@@ -27,7 +27,7 @@ export interface Beton {
  * de C50/60).
  */
 export function beton(fck: number, profil: ProfilEc2): Beton {
-  exigerPositif(fck, 'La resistance caracteristique du beton f_ck', 'MPa');
+  exigerPositif(fck, 'La résistance caractéristique du béton f_ck', 'MPa');
   if (fck > 90) throw new Error('f_ck > 90 MPa : hors du domaine du tableau 3.1.');
   const fcm = fck + 8;
   const haut = fck > 50;
@@ -51,7 +51,7 @@ export function contrainteBeton(b: Beton, eps: number): number {
 
 /** f_yd = f_yk / gamma_S (MPa). */
 export function fyd(fyk: number, profil: ProfilEc2): number {
-  exigerPositif(fyk, 'La limite d elasticite f_yk', 'MPa');
+  exigerPositif(fyk, "La limite d'élasticité f_yk", 'MPa');
   return fyk / profil.gamma_S.valeur;
 }
 

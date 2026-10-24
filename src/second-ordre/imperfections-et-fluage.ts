@@ -29,7 +29,7 @@ export interface Imperfection {
 export function imperfection(l: number, l0: number, m: number, profil: ProfilEc2): Imperfection {
   exigerPositif(l, 'La longueur l', 'mm');
   exigerPositif(l0, 'La longueur efficace l_0', 'mm');
-  if (!Number.isFinite(m) || m < 1) throw new Error('Le nombre d elements m doit etre au moins 1 (-).');
+  if (!Number.isFinite(m) || m < 1) throw new Error("Le nombre d'éléments m doit être au moins 1 (-).");
   const alpha_h = Math.min(1, Math.max(2 / 3, 2 / Math.sqrt(l / MM_PAR_M)));
   const alpha_m = Math.sqrt(0.5 * (1 + 1 / m));
   const theta_i = profil.theta_0.valeur * alpha_h * alpha_m;
@@ -57,17 +57,17 @@ export function fluageEffectif(
 ): { phi_ef: number; motif: string } {
   exigerPositifOuNul(phi_inf, 'Le coefficient de fluage phi(inf, t0)', '-');
   exigerPositifOuNul(rapport, 'Le rapport M_0Eqp / M_0Ed', '-');
-  if (rapport > 1) throw new Error('Le rapport M_0Eqp / M_0Ed ne peut pas depasser 1 (-).');
+  if (rapport > 1) throw new Error('Le rapport M_0Eqp / M_0Ed ne peut pas dépasser 1 (-).');
   const excentricite = (M0Ed / NEd) * MM_PAR_M;
   const manques: string[] = [];
   if (phi_inf > 2) manques.push(`phi(inf, t0) = ${fr(phi_inf, 2)} > 2`);
   if (lambda > 75) manques.push(`lambda = ${fr(lambda, 1)} > 75`);
   if (excentricite < h) manques.push(`M_0Ed / N_Ed = ${fr(excentricite, 0)} mm, plus petit que h = ${fr(h, 0)} mm`);
   if (manques.length === 0) {
-    return { phi_ef: 0, motif: 'fluage neglige : les trois conditions du §5.8.4(4) sont remplies' };
+    return { phi_ef: 0, motif: 'fluage négligé : les trois conditions du §5.8.4(4) sont remplies' };
   }
   return {
     phi_ef: phi_inf * rapport,
-    motif: `phi_ef = ${fr(phi_inf, 2)} x ${fr(rapport, 2)} ; fluage non negligeable (${manques.join(' ; ')})`,
+    motif: `phi_ef = ${fr(phi_inf, 2)} x ${fr(rapport, 2)} ; fluage non négligeable (${manques.join(' ; ')})`,
   };
 }

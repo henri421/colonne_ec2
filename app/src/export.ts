@@ -9,12 +9,12 @@ import { JETONS, notationHtml, type BlocResultat } from 'aedificium-ui';
 
 /** Hypotheses et limites rappelees dans la note de calcul. */
 export const HYPOTHESES_NOTE: string[] = [
-  'Element isole ; imperfection e_i = theta_i l_0 / 2 (§5.2(7)).',
-  'Moments d extremite majores de N e_i ; moment equivalent M_0e = 0,6 M_02 + 0,4 M_01 >= 0,4 M_02 (§5.8.8.2(2)).',
-  'Excentricite minimale e_0 = max(h/30 ; 20 mm) (§6.1(4)).',
-  'Section : loi parabole-rectangle, acier a palier horizontal, beton deplace par les barres deduit.',
-  'P-delta : barre biarticulee equivalente de longueur l_0, rigidite nominale EI.',
-  'Valeurs recommandees de l EN 1992-1-1 ; aucune annexe nationale codee.',
+  'Élément isolé ; imperfection e_i = theta_i l_0 / 2 (§5.2(7)).',
+  "Moments d'extrémité majorés de N × e_i ; moment équivalent M_0e = 0,6 M_02 + 0,4 M_01 >= 0,4 M_02 (§5.8.8.2(2)).",
+  'Excentricité minimale e_0 = max(h/30 ; 20 mm) (§6.1(4)).',
+  'Section : loi parabole-rectangle, acier à palier horizontal, béton déplacé par les barres déduit.',
+  'P-delta : barre biarticulée équivalente de longueur l_0, rigidité nominale EI.',
+  "Valeurs recommandées de l'EN 1992-1-1 ; aucune annexe nationale codée.",
 ];
 
 /**
@@ -54,8 +54,8 @@ export interface NoteDeCalcul {
 
 const AIDE_AU_CALCUL =
   "Outil d'aide au calcul. Cet outil constate, il ne prescrit pas : il rend des moments et des " +
-  "taux de travail, jamais un ferraillage. La verification finale et la responsabilite incombent a " +
-  "l'ingenieur du projet. Cette note est un compte rendu, pas une justification reglementaire signee.";
+  "taux de travail, jamais un ferraillage. La vérification finale et la responsabilité incombent à " +
+  "l'ingénieur du projet. Cette note est un compte rendu, pas une justification réglementaire signée.";
 
 const STYLE_NOTE = `
   body { margin: 0; padding: 24px 28px; background: var(--surface); color: var(--texte); font: 14px/1.5 var(--sans); }
@@ -102,18 +102,18 @@ export function noteDeCalculHtml(note: NoteDeCalcul, styles: string): string {
   const hypotheses =
     note.hypotheses.length === 0
       ? ''
-      : `<h2>Hypotheses et limites</h2><ul>${note.hypotheses.map((h) => `<li>${notationHtml(h)}</li>`).join('')}</ul>`;
+      : `<h2>Hypothèses et limites</h2><ul>${note.hypotheses.map((h) => `<li>${notationHtml(h)}</li>`).join('')}</ul>`;
   return `<!doctype html>
 <html lang="fr"><head><meta charset="utf-8" />
 <title>Note de calcul — ${notationHtml(note.titre)}</title>
 <style>${styles}${STYLE_NOTE}</style></head>
 <body>
-<h1>Note de calcul — poteau en beton arme (EN 1992-1-1 §5.8, §6.1)</h1>
+<h1>Note de calcul — poteau en béton armé (EN 1992-1-1 §5.8, §6.1)</h1>
 <p class="date">${notationHtml(note.titre)} · ${notationHtml(note.date)} · profil : ${notationHtml(note.profil)}</p>
 ${avertissements}
-<h2>Donnees d entree</h2>${note.entrees.map(tableDuBloc).join('')}
-<h2>Section et diagramme d interaction</h2>${dessins}
-<h2>Verifications</h2>${note.resultats.map(tableDuBloc).join('')}
+<h2>Données d'entrée</h2>${note.entrees.map(tableDuBloc).join('')}
+<h2>Section et diagramme d'interaction</h2>${dessins}
+<h2>Vérifications</h2>${note.resultats.map(tableDuBloc).join('')}
 ${hypotheses}
 <p class="pied">${AIDE_AU_CALCUL}</p>
 </body></html>`;

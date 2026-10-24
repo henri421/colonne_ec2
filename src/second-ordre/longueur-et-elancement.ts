@@ -16,12 +16,12 @@ function souplesse(m: Maintien, profil: ProfilEc2, nom: string, avert: string[])
   const kmin = profil.k_min.valeur;
   if (m.mode === 'articule') return Infinity;
   if (m.mode === 'encastre') {
-    avert.push(`${nom} : encastrement compte avec k = ${fr(kmin, 2)}, minimum recommande (§5.8.3.2(3)).`);
+    avert.push(`${nom} : encastrement compté avec k = ${fr(kmin, 2)}, minimum recommandé (§5.8.3.2(3)).`);
     return kmin;
   }
   exigerPositifOuNul(m.k, `La souplesse k (${nom})`, '-');
   if (m.k < kmin) {
-    avert.push(`${nom} : k = ${m.k} porte au minimum recommande ${fr(kmin, 2)} (§5.8.3.2(3)).`);
+    avert.push(`${nom} : k = ${fr(m.k, 2)} porté au minimum recommandé ${fr(kmin, 2)} (§5.8.3.2(3)).`);
     return kmin;
   }
   return m.k;
@@ -46,23 +46,23 @@ export function longueurEfficace(
 ): { l0: number; origine: string } {
   exigerPositif(l, 'La longueur libre l', 'mm');
   if (d.mode === 'saisie') {
-    return { l0: exigerPositif(d.l0, 'La longueur efficace l_0', 'mm'), origine: 'saisie par l utilisateur' };
+    return { l0: exigerPositif(d.l0, 'La longueur efficace l_0', 'mm'), origine: "saisie par l'utilisateur" };
   }
   const k1 = souplesse(d.tete, profil, 'tete', avert);
   const k2 = souplesse(d.pied, profil, 'pied', avert);
   if (d.contreventement === 'contrevente') {
     const l0 = 0.5 * l * Math.sqrt((1 + rapport(k1, 0.45)) * (1 + rapport(k2, 0.45)));
-    return { l0, origine: `element contrevente, k1 = ${k1 === Infinity ? 'infini' : fr(k1, 2)}, k2 = ${k2 === Infinity ? 'infini' : fr(k2, 2)}, expression (5.15)` };
+    return { l0, origine: `élément contreventé, k1 = ${k1 === Infinity ? 'infini' : fr(k1, 2)}, k2 = ${k2 === Infinity ? 'infini' : fr(k2, 2)}, expression (5.15)` };
   }
   if (k1 === Infinity && k2 === Infinity) {
-    throw new Error('Element non contrevente articule aux deux extremites : mecanisme, aucune longueur efficace.');
+    throw new Error('Élément non contreventé articulé aux deux extrémités : mécanisme, aucune longueur efficace.');
   }
   const produit = k1 === Infinity ? k2 : k2 === Infinity ? k1 : (k1 * k2) / (k1 + k2);
   const a = Math.sqrt(1 + 10 * produit);
   const b = (1 + rapport(k1, 1)) * (1 + rapport(k2, 1));
   return {
     l0: l * Math.max(a, b),
-    origine: `element non contrevente, k1 = ${k1 === Infinity ? 'infini' : fr(k1, 2)}, k2 = ${k2 === Infinity ? 'infini' : fr(k2, 2)}, expression (5.16)`,
+    origine: `élément non contreventé, k1 = ${k1 === Infinity ? 'infini' : fr(k1, 2)}, k2 = ${k2 === Infinity ? 'infini' : fr(k2, 2)}, expression (5.16)`,
   };
 }
 
@@ -99,11 +99,11 @@ export function elancementLimite(
   if (moments.origine === 'transversales') {
     C = 0.7;
     origineC = 'impose-par-la-norme';
-    motifC = 'moments dus a des charges transversales : C = 0,7 impose, r_m non employable';
+    motifC = 'moments dus à des charges transversales : C = 0,7 imposé, r_m non employable';
   } else if (!contrevente) {
     C = 0.7;
     origineC = 'impose-par-la-norme';
-    motifC = 'element non contrevente : C = 0,7 impose, r_m non employable';
+    motifC = 'élément non contreventé : C = 0,7 imposé, r_m non employable';
   } else {
     const { M01, M02 } = momentsOrdonnes(moments.M_tete, moments.M_pied);
     const rm = M02 === 0 ? 1 : M01 / M02;

@@ -95,13 +95,13 @@ class ErreurDeSaisie extends Error {}
 function choix<T extends string>(v: Record<string, string>, nom: string, permis: readonly T[]): T {
   const x = v[nom];
   if ((permis as readonly string[]).includes(x)) return x as T;
-  throw new ErreurDeSaisie(`Valeur inattendue pour ${nom} : « ${x ?? ''} ».`);
+  throw new ErreurDeSaisie('Valeur inattendue dans le formulaire.');
 }
 
 function nombre(v: Record<string, string>, nom: string, requis: boolean, repli: number): number {
   const x = lireNombre(v[nom] ?? '');
   if (x === null) {
-    if (requis) throw new ErreurDeSaisie(`${nom} : nombre attendu.`);
+    if (requis) throw new ErreurDeSaisie('Un nombre est attendu dans le formulaire.');
     return repli;
   }
   return x;

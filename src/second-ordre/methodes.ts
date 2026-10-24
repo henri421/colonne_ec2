@@ -111,7 +111,7 @@ export function rigiditeNominale(p: {
   NEd: number;
 }): Rigidite {
   if (p.rho < 0.002) {
-    throw new Error(`rho = ${fr(p.rho * 100, 2)} % < 0,2 % : la rigidite nominale du §5.8.7.2(2) ne s applique pas.`);
+    throw new Error(`rho = ${fr(p.rho * 100, 2)} % < 0,2 % : la rigidité nominale du §5.8.7.2(2) ne s'applique pas.`);
   }
   const k1 = Math.sqrt(p.fck / 20);
   const k2 = Math.min(0.2, (p.n * p.lambda) / 170);
@@ -150,7 +150,7 @@ function formeEn(forme: FormeMoment, t: number): number {
  * cette rigidite, et le resultat le dit.
  */
 export function pDelta(M0: number, forme: FormeMoment, NEd: number, EI_kNm2: number, l0: number): PDelta {
-  exigerPositif(EI_kNm2, 'La rigidite EI', 'kN.m2');
+  exigerPositif(EI_kNm2, 'La rigidité EI', 'kN.m2');
   const N = 80;
   const L = l0 / 1000; // m
   const h = L / N;
@@ -174,7 +174,7 @@ export function pDelta(M0: number, forme: FormeMoment, NEd: number, EI_kNm2: num
     y = nouveau;
     Mmax = Math.max(...M0x.map((m, i) => Math.abs(m + NEd * y[i])));
     if (!Number.isFinite(fleche) || fleche > 10 * L) {
-      return { converge: false, iterations: it, M_max: Infinity, amplification: Infinity, motif: 'fleche divergente : instable sous la rigidite nominale' };
+      return { converge: false, iterations: it, M_max: Infinity, amplification: Infinity, motif: 'flèche divergente : instable sous la rigidité nominale' };
     }
     if (ecart <= 1e-9 * Math.max(1, fleche) || ecart < 1e-12) {
       return {
@@ -182,11 +182,11 @@ export function pDelta(M0: number, forme: FormeMoment, NEd: number, EI_kNm2: num
         iterations: it,
         M_max: Mmax,
         amplification: M0 === 0 ? 1 : Mmax / Math.abs(M0),
-        motif: `stabilisee en ${it} iterations, fleche ${fr(fleche * 1000, 1)} mm`,
+        motif: `stabilisée en ${it} itérations, flèche ${fr(fleche * 1000, 1)} mm`,
       };
     }
   }
-  return { converge: false, iterations: ITER_MAX, M_max: Mmax, amplification: M0 === 0 ? 1 : Mmax / Math.abs(M0), motif: `non stabilisee apres ${ITER_MAX} iterations` };
+  return { converge: false, iterations: ITER_MAX, M_max: Mmax, amplification: M0 === 0 ? 1 : Mmax / Math.abs(M0), motif: `non stabilisée après ${ITER_MAX} itérations` };
 }
 
 export { NMM_PAR_KNM };

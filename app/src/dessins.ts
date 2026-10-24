@@ -64,7 +64,7 @@ export function dessinInteraction(courbes: Record<Axe, Array<{ N: number; M: num
     Number.isFinite(M)
       ? `<circle class="${cls}" cx="${X(M).toFixed(1)}" cy="${Y(r.N_Ed).toFixed(1)}" r="4.5"><title>${notationSvg(`${nom} : N_Ed = ${aff(r.N_Ed, 0)} kN, M_Ed = ${aff(M, 1)} kN.m`)}</title></circle>`
       : '';
-  return `<svg class="schema-interaction" viewBox="0 0 ${W} ${H}" role="img" aria-label="Diagramme d interaction">
+  return `<svg class="schema-interaction" viewBox="0 0 ${W} ${H}" role="img" aria-label="Diagramme d'interaction">
 <line class="axe" x1="${g}" y1="${Y(0).toFixed(1)}" x2="${W - 10}" y2="${Y(0).toFixed(1)}"/>
 <line class="axe" x1="${g}" y1="10" x2="${g}" y2="${H - g}"/>
 ${trace(courbes.y, 'courbe-y')}${trace(courbes.z, 'courbe-z')}

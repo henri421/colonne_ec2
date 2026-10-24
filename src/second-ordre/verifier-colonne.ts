@@ -108,11 +108,11 @@ function direction(ctx: Contexte, axe: Axe, dd: DonneesDirection, avecImperfecti
   let instable = false;
   let M_Ed: number;
   let origineMEd: string;
-  const candidats: Array<[number, string]> = [[Mmin, `excentricite minimale e_0 = ${fr(e_0, 0)} mm (§6.1(4))`]];
-  if (dd.moments.origine === 'extremites') candidats.push([M02, 'moment d extremite M_02 + N e_i']);
+  const candidats: Array<[number, string]> = [[Mmin, `excentricité minimale e_0 = ${fr(e_0, 0)} mm (§6.1(4))`]];
+  if (dd.moments.origine === 'extremites') candidats.push([M02, "moment d'extrémité M_02 + N × e_i"]);
 
   if (negligeable) {
-    candidats.push([M0Ed, dd.moments.origine === 'transversales' ? 'M_0 + N e_i, second ordre negligeable' : contrevente ? 'M_0e + N e_i, second ordre negligeable' : 'M_02 + N e_i, second ordre negligeable']);
+    candidats.push([M0Ed, dd.moments.origine === 'transversales' ? 'M_0 + N × e_i, second ordre négligeable' : contrevente ? 'M_0e + N × e_i, second ordre négligeable' : 'M_02 + N × e_i, second ordre négligeable']);
   } else if (d.methode === 'courbure-nominale') {
     courbure = courbureNominale({
       fyd: f_yd,
@@ -133,7 +133,7 @@ function direction(ctx: Contexte, axe: Axe, dd: DonneesDirection, avecImperfecti
     if (rig.instable) {
       instable = true;
     } else {
-      candidats.push([M0Ed * rig.amplification, 'M_0Ed x amplification, rigidite nominale (5.28)']);
+      candidats.push([M0Ed * rig.amplification, 'M_0Ed x amplification, rigidité nominale (5.28)']);
     }
   }
   [M_Ed, origineMEd] = candidats.reduce((a, c) => (c[0] > a[0] ? c : a));
@@ -192,7 +192,7 @@ export function exposantDevie(rapport: number, circulaire: boolean): number {
 
 export function verifierColonne(d: DonneesColonne, profil: ProfilEc2): ResultatColonne {
   verifierProfil(profil);
-  exigerPositif(d.N_Ed, 'L effort normal de compression N_Ed', 'kN');
+  exigerPositif(d.N_Ed, "L'effort normal de compression N_Ed", 'kN');
   const b = beton(d.fck, profil);
   const f_yd = fydDe(d.fyk, profil);
   const ctx: Contexte = { d, profil, b, f_yd, Ac: aireBeton(d.section), As: aireAcier(d.section), avert: [] };
@@ -215,7 +215,7 @@ export function verifierColonne(d: DonneesColonne, profil: ProfilEc2): ResultatC
   } else if (elancements && excentricites) {
     devie = {
       dispense: true,
-      motif: `lambda_y / lambda_z = ${fr(ly / lz, 2)} dans [0,5 ; 2] et rapport des excentricites relatives ${Number.isFinite(rapportEx) ? fr(rapportEx, 2) : 'infini'} hors de ]0,2 ; 5[ : verifications separees (§5.8.9(3))`,
+      motif: `lambda_y / lambda_z = ${fr(ly / lz, 2)} dans [0,5 ; 2] et rapport des excentricités relatives ${Number.isFinite(rapportEx) ? fr(rapportEx, 2) : 'infini'} hors de ]0,2 ; 5[ : vérifications séparées (§5.8.9(3))`,
       a: null,
       taux: null,
     };
@@ -230,7 +230,7 @@ export function verifierColonne(d: DonneesColonne, profil: ProfilEc2): ResultatC
     const t2 = (ySans.M_Ed / y.M_Rd) ** a + (z.M_Ed / z.M_Rd) ** a;
     devie = {
       dispense: false,
-      motif: `${!elancements ? 'rapport des elancements hors de [0,5 ; 2]' : 'excentricites relatives comparables'} : interaction (5.39), N_Ed / N_Rd = ${fr(d.N_Ed / NRd, 3)}, imperfection dans la direction la plus defavorable`,
+      motif: `${!elancements ? 'rapport des élancements hors de [0,5 ; 2]' : 'excentricités relatives comparables'} : interaction (5.39), N_Ed / N_Rd = ${fr(d.N_Ed / NRd, 3)}, imperfection dans la direction la plus défavorable`,
       a,
       taux: Math.max(t1, t2),
     };
@@ -244,7 +244,7 @@ export function verifierColonne(d: DonneesColonne, profil: ProfilEc2): ResultatC
   } else {
     const tauxMax = Math.max(y.taux, z.taux, devie.taux ?? 0);
     verdict = tauxMax <= 1 ? 'conforme' : 'non-conforme';
-    motif = `Taux maximal ${tauxFr(tauxMax)} : M_Ed / M_Rd = ${tauxFr(y.taux)} autour de y, ${tauxFr(z.taux)} autour de z${devie.taux === null ? '' : `, flexion deviee ${tauxFr(devie.taux)}`}.`;
+    motif = `Taux maximal ${tauxFr(tauxMax)} : M_Ed / M_Rd = ${tauxFr(y.taux)} autour de y, ${tauxFr(z.taux)} autour de z${devie.taux === null ? '' : `, flexion déviée ${tauxFr(devie.taux)}`}.`;
   }
   return { verdict, motif, methode: d.methode, N_Ed: d.N_Ed, N_Rd_max, y, z, devie, avertissements: ctx.avert };
 }

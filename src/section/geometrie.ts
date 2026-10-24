@@ -47,14 +47,14 @@ export interface Barre {
 
 /** Barres de la section, coordonnees de leur centre (mm). */
 export function barres(s: Section): Barre[] {
-  exigerPositif(s.phi, 'Le diametre des barres phi', 'mm');
-  exigerPositif(s.enrobageAxe, 'La distance a l axe des barres d prime', 'mm');
+  exigerPositif(s.phi, 'Le diamètre des barres phi', 'mm');
+  exigerPositif(s.enrobageAxe, "La distance à l'axe des barres d prime", 'mm');
   const A = (Math.PI * s.phi * s.phi) / 4;
   if (s.forme === 'circulaire') {
-    exigerPositif(s.D, 'Le diametre D', 'mm');
+    exigerPositif(s.D, 'Le diamètre D', 'mm');
     if (!Number.isInteger(s.n) || s.n < 4) throw new Error('Une section circulaire porte au moins 4 barres (-).');
     const r = s.D / 2 - s.enrobageAxe;
-    if (r <= 0) throw new Error('La distance a l axe des barres depasse le rayon (mm).');
+    if (r <= 0) throw new Error("La distance à l'axe des barres dépasse le rayon (mm).");
     return Array.from({ length: s.n }, (_, i) => {
       const t = (2 * Math.PI * i) / s.n;
       return { y: r * Math.cos(t), z: r * Math.sin(t), A };
@@ -67,7 +67,7 @@ export function barres(s: Section): Barre[] {
   }
   const ys = s.b / 2 - s.enrobageAxe;
   const zs = s.h / 2 - s.enrobageAxe;
-  if (ys <= 0 || zs <= 0) throw new Error('La distance a l axe des barres depasse la demi-dimension (mm).');
+  if (ys <= 0 || zs <= 0) throw new Error("La distance à l'axe des barres dépasse la demi-dimension (mm).");
   const res: Barre[] = [];
   // Faces z = +-zs : nb barres, angles compris.
   for (let i = 0; i < s.nb; i++) {

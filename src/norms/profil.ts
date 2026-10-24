@@ -35,19 +35,19 @@ export function verifierProfil(p: ProfilEc2): void {
     if (nom === 'nom' || nom === 'date') continue;
     const vs = v as ValeurSourcee;
     if (!Number.isFinite(vs.valeur) || vs.valeur <= 0) {
-      throw new Error(`Profil « ${p.nom} » : ${nom} doit etre un nombre strictement positif.`);
+      throw new Error(`Profil « ${p.nom} » : ${nom} doit être un nombre strictement positif.`);
     }
     if (typeof vs.source !== 'string' || vs.source.trim() === '') {
-      throw new Error(`Profil « ${p.nom} » : ${nom} n a pas de source. Une valeur de provenance inconnue bloque le calcul.`);
+      throw new Error(`Profil « ${p.nom} » : ${nom} n'a pas de source. Une valeur de provenance inconnue bloque le calcul.`);
     }
   }
 }
 
-const EN = 'EN 1992-1-1:2004, valeur recommandee';
+const EN = 'EN 1992-1-1:2004, valeur recommandée';
 
 export function ec2Recommande(): ProfilEc2 {
   return {
-    nom: 'Eurocode 2, valeurs recommandees',
+    nom: 'Eurocode 2, valeurs recommandées',
     date: '2026-10-03',
     gamma_C: { valeur: 1.5, source: `${EN}, tableau 2.1N` },
     gamma_S: { valeur: 1.15, source: `${EN}, tableau 2.1N` },
@@ -61,14 +61,14 @@ export function ec2Recommande(): ProfilEc2 {
 
 export function exigerPositif(valeur: number, nom: string, unite: string): number {
   if (!Number.isFinite(valeur) || valeur <= 0) {
-    throw new Error(`${nom} doit etre un nombre strictement positif (${unite}).`);
+    throw new Error(`${nom} doit être un nombre strictement positif (${unite}).`);
   }
   return valeur;
 }
 
 export function exigerPositifOuNul(valeur: number, nom: string, unite: string): number {
   if (!Number.isFinite(valeur) || valeur < 0) {
-    throw new Error(`${nom} doit etre un nombre positif ou nul (${unite}).`);
+    throw new Error(`${nom} doit être un nombre positif ou nul (${unite}).`);
   }
   return valeur;
 }

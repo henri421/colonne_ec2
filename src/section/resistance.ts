@@ -91,10 +91,10 @@ export function momentResistant(s: Section, b: Beton, f_yd: number, axe: Axe, NE
   const nMax = compressionMaximale(s, b, f_yd);
   const nMin = tractionMaximale(s, f_yd);
   if (NEd > nMax) {
-    throw new Error(`N_Ed = ${fr(NEd, 0)} kN depasse la compression centree resistante N_Rd,max = ${fr(nMax, 0)} kN.`);
+    throw new Error(`N_Ed = ${fr(NEd, 0)} kN dépasse la compression centrée résistante N_Rd,max = ${fr(nMax, 0)} kN.`);
   }
   if (NEd < nMin) {
-    throw new Error(`N_Ed = ${fr(NEd, 0)} kN depasse la traction centree resistante ${fr(nMin, 0)} kN.`);
+    throw new Error(`N_Ed = ${fr(NEd, 0)} kN dépasse la traction centrée résistante ${fr(nMin, 0)} kN.`);
   }
   const H = hauteurFlexion(s, axe);
   // N(x) est croissant : dichotomie sur log(x), de presque nul a tres grand.
