@@ -5,7 +5,7 @@
  * Module PUR : chaines SVG.
  */
 
-import { echapper, nombreFr } from 'aedificium-ui';
+import { nombreFr, notationSvg } from 'aedificium-ui';
 import type { Axe, Beton, ResultatColonne, Section } from '../../src/index';
 import { barres, efforts, hauteurFlexion } from '../../src/index';
 
@@ -27,8 +27,8 @@ export function dessinSection(s: Section): string {
     .join('');
   const cotes =
     s.forme === 'circulaire'
-      ? `<text class="cote" x="${cx}" y="${T - 6}">D = ${nombreFr(s.D, 0)} mm</text>`
-      : `<text class="cote" x="${cx}" y="${T - 6}">b = ${nombreFr(s.b, 0)} mm (y)</text><text class="cote" x="12" y="${cy}" transform="rotate(-90 12 ${cy})">h = ${nombreFr(s.h, 0)} mm (z)</text>`;
+      ? `<text class="cote" x="${cx}" y="${T - 6}">${notationSvg(`D = ${nombreFr(s.D, 0)} mm`)}</text>`
+      : `<text class="cote" x="${cx}" y="${T - 6}">${notationSvg(`b = ${nombreFr(s.b, 0)} mm (y)`)}</text><text class="cote" x="12" y="${cy}" transform="rotate(-90 12 ${cy})">${notationSvg(`h = ${nombreFr(s.h, 0)} mm (z)`)}</text>`;
   return `<svg class="schema-section" viewBox="0 0 ${T} ${T}" role="img" aria-label="Coupe de la section">${forme}${pts}<line class="axe" x1="${marge / 2}" y1="${cy}" x2="${T - marge / 2}" y2="${cy}"/><line class="axe" x1="${cx}" y1="${marge / 2}" x2="${cx}" y2="${T - marge / 2}"/><text class="axe-nom" x="${T - marge / 2 + 2}" y="${cy - 4}">y</text><text class="axe-nom" x="${cx + 4}" y="${marge / 2 + 2}">z</text>${cotes}</svg>`;
 }
 
@@ -59,7 +59,7 @@ export function dessinInteraction(courbes: Record<Axe, Array<{ N: number; M: num
     `<polyline class="${cls}" points="${pts.map((p) => `${X(p.M).toFixed(1)},${Y(p.N).toFixed(1)}`).join(' ')}"/>`;
   const point = (M: number, cls: string, nom: string): string =>
     Number.isFinite(M)
-      ? `<circle class="${cls}" cx="${X(M).toFixed(1)}" cy="${Y(r.N_Ed).toFixed(1)}" r="4.5"><title>${echapper(`${nom} : N_Ed = ${nombreFr(r.N_Ed, 0)} kN, M_Ed = ${nombreFr(M, 1)} kN.m`)}</title></circle>`
+      ? `<circle class="${cls}" cx="${X(M).toFixed(1)}" cy="${Y(r.N_Ed).toFixed(1)}" r="4.5"><title>${notationSvg(`${nom} : N_Ed = ${nombreFr(r.N_Ed, 0)} kN, M_Ed = ${nombreFr(M, 1)} kN.m`)}</title></circle>`
       : '';
   return `<svg class="schema-interaction" viewBox="0 0 ${W} ${H}" role="img" aria-label="Diagramme d interaction">
 <line class="axe" x1="${g}" y1="${Y(0).toFixed(1)}" x2="${W - 10}" y2="${Y(0).toFixed(1)}"/>
@@ -72,6 +72,6 @@ ${point(r.y.M_Ed, 'point-y', 'autour de y')}${point(r.z.M_Ed, 'point-z', 'autour
 <text class="legende" x="${g}" y="${H - g + 16}">0</text>
 <text class="legende" x="${W - 12}" y="${H - g + 16}" text-anchor="end">${nombreFr(Mmax, 0)}</text>
 <text class="legende" x="${g - 4}" y="${(Y(Nmax / 1.05) + 4).toFixed(1)}" text-anchor="end">${nombreFr(Nmax / 1.05, 0)}</text>
-<text class="legende-y" x="${g + 6}" y="${H - 8}">— autour de y</text><text class="legende-z" x="${g + 120}" y="${H - 8}">— autour de z</text><text class="legende" x="${g + 234}" y="${H - 8}">● M_Ed sous N_Ed</text>
+<text class="legende-y" x="${g + 6}" y="${H - 8}">— autour de y</text><text class="legende-z" x="${g + 120}" y="${H - 8}">— autour de z</text><text class="legende" x="${g + 234}" y="${H - 8}">${notationSvg('● M_Ed sous N_Ed')}</text>
 </svg>`;
 }

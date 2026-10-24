@@ -3,8 +3,9 @@
  * note. Module PUR. Unites : mm, kN, kN.m.
  */
 
-import { echapper, nombreFr, tauxFr, type BlocResultat, type LigneResultat } from 'aedificium-ui';
+import { echapper, notationHtml, nombreFr, tauxFr, type BlocResultat, type LigneResultat } from 'aedificium-ui';
 import type { ResultatColonne, ResultatDirection } from '../../src/index';
+import type { ModeleSaisie } from './form';
 
 export function messageDErreur(e: unknown): string {
   return e instanceof Error ? e.message : String(e);
@@ -71,7 +72,7 @@ export function lignesDevie(r: ResultatColonne): LigneResultat[] {
     L('flexion deviee', r.devie.motif, r.devie.dispense ? 'dispensee' : r.devie.taux === null ? 'sans objet' : 'verifiee'),
     ...(r.devie.a === null || r.devie.taux === null
       ? []
-      : [L('a', 'exposant de (5.39)', nombreFr(r.devie.a, 3)), L('taux', '(M_Edz/M_Rdz)^a + (M_Edy/M_Rdy)^a', tauxFr(r.devie.taux))]),
+      : [L('a', 'exposant de (5.39)', nombreFr(r.devie.a, 3)), L('taux', '(M_Edz / M_Rdz) puissance a + (M_Edy / M_Rdy) puissance a', tauxFr(r.devie.taux))]),
   ];
 }
 
@@ -100,15 +101,50 @@ export function blocs(r: ResultatColonne): BlocResultat[] {
 
 export function tableHtml(lignes: readonly LigneResultat[]): string {
   return `<table class="grandeurs"><tbody>${lignes
-    .map((l) => `<tr><th>${echapper(l.symbole)}</th><td class="libelle">${echapper(l.libelle)}</td><td class="valeur">${echapper(l.valeur)}</td></tr>`)
+    .map((l) => `<tr><th>${notationHtml(l.symbole)}</th><td class="libelle">${notationHtml(l.libelle)}</td><td class="valeur">${notationHtml(l.valeur)}</td></tr>`)
     .join('')}</tbody></table>`;
+}
+
+/** Avertissements du noyau, un bloc d'alerte par element. */
+export function avertissementsHtml(liste: readonly string[]): string {
+  return liste.map((a) => `<p class="alerte">${notationHtml(a)}</p>`).join('');
+}
+
+/** Libelles des valeurs d'union affichees, jamais leur identifiant. */
+const FORMES: Record<ModeleSaisie['forme'], string> = {
+  rectangulaire: 'rectangulaire',
+  circulaire: 'circulaire',
+};
+
+const METHODES: Record<ModeleSaisie['methode'], string> = {
+  'courbure-nominale': 'courbure nominale',
+  'rigidite-nominale': 'rigidite nominale',
+};
+
+/** Bloc des donnees saisies, pour le CSV et la note. */
+export function blocEntrees(m: ModeleSaisie): BlocResultat {
+  const section =
+    m.forme === 'rectangulaire'
+      ? `${m.b} x ${m.h} mm, ${2 * m.nb + 2 * m.nh - 4} HA${m.phi}, d' = ${m.enrobageAxe} mm`
+      : `D = ${m.D} mm, ${m.n} HA${m.phi}, d' = ${m.enrobageAxe} mm`;
+  return {
+    titre: 'Donnees',
+    lignes: [
+      { symbole: 'section', libelle: FORMES[m.forme], valeur: section },
+      { symbole: 'f_ck / f_yk', libelle: 'materiaux', valeur: `${m.fck} / ${m.fyk} MPa` },
+      { symbole: 'l, N_Ed', libelle: 'longueur libre, effort normal', valeur: `${m.l} m ; ${m.NEd} kN` },
+      { symbole: 'phi(inf, t0)', libelle: `M_0Eqp / M_0Ed = ${m.rapport}`, valeur: String(m.phiInf) },
+      { symbole: 'methode', libelle: 'second ordre', valeur: METHODES[m.methode] },
+    ],
+    note: null,
+  };
 }
 
 const TITRES: Record<string, string> = { conforme: 'Conforme', 'non-conforme': 'Non conforme', instable: 'Instable' };
 
 export function verdictHtml(r: ResultatColonne): string {
   return (
-    `<p class="verdict verdict-${echapper(r.verdict)}">${echapper(TITRES[r.verdict])}</p><p class="motif">${echapper(r.motif)}</p>` +
+    `<p class="verdict verdict-${echapper(r.verdict)}">${notationHtml(TITRES[r.verdict])}</p><p class="motif">${notationHtml(r.motif)}</p>` +
     tableHtml(lignesVerdict(r).slice(1))
   );
 }

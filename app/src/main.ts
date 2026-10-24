@@ -4,12 +4,12 @@
  * `dessins` et `export`, tous purs.
  */
 
-import { echapper, ouvrirOuTelecharger, resultatsEnCsv, svgAutonome, telecharger, type BlocResultat } from 'aedificium-ui';
+import { blocsEnTexte, notationTexte, ouvrirOuTelecharger, resultatsEnCsv, svgAutonome, telecharger } from 'aedificium-ui';
 import { beton, ec2Recommande, fyd, verifierColonne, type ResultatColonne } from '../../src/index';
 import { champsDepuisModele, donneesDepuisModele, modeleDepuisChamps, modeleParDefaut, sectionDepuisModele, type ModeleSaisie } from './form';
 import { courbeInteraction, dessinInteraction, dessinSection } from './dessins';
-import { blocs, lignesDevie, lignesDirection, lignesPDelta, messageDErreur, tableHtml, verdictHtml } from './vue';
-import { STYLES_TRACE, noteDeCalculHtml } from './export';
+import { avertissementsHtml, blocEntrees, blocs, lignesDevie, lignesDirection, lignesPDelta, messageDErreur, tableHtml, verdictHtml } from './vue';
+import { HYPOTHESES_NOTE, STYLES_TRACE, noteDeCalculHtml } from './export';
 import './style.css';
 
 function exige<T extends Element>(selecteur: string): T {
@@ -74,7 +74,7 @@ function ajusterLesGroupes(m: ModeleSaisie): void {
 }
 
 function montrer(el: HTMLElement, message: string | null): void {
-  el.textContent = message ?? '';
+  el.textContent = message === null ? '' : notationTexte(message);
   el.hidden = message === null;
 }
 
@@ -107,7 +107,7 @@ function rafraichir(): void {
     const svgSection = dessinSection(s);
     const svgInter = dessinInteraction({ y: courbeInteraction(s, b, f, 'y'), z: courbeInteraction(s, b, f, 'z') }, r);
     zones.verdict.innerHTML = verdictHtml(r);
-    zones.avertissements.innerHTML = r.avertissements.map((a) => `<p class="alerte">${echapper(a)}</p>`).join('');
+    zones.avertissements.innerHTML = avertissementsHtml(r.avertissements);
     zones.section.innerHTML = svgSection;
     zones.interaction.innerHTML = svgInter;
     zones.dirY.innerHTML = tableHtml(lignesDirection(r.y));
@@ -120,24 +120,6 @@ function rafraichir(): void {
   } catch (e) {
     montrer(zones.erreur, messageDErreur(e));
   }
-}
-
-function entrees(m: ModeleSaisie): BlocResultat {
-  const section =
-    m.forme === 'rectangulaire'
-      ? `${m.b} x ${m.h} mm, ${2 * m.nb + 2 * m.nh - 4} HA${m.phi}, d' = ${m.enrobageAxe} mm`
-      : `D = ${m.D} mm, ${m.n} HA${m.phi}, d' = ${m.enrobageAxe} mm`;
-  return {
-    titre: 'Donnees',
-    lignes: [
-      { symbole: 'section', libelle: m.forme, valeur: section },
-      { symbole: 'f_ck / f_yk', libelle: 'materiaux', valeur: `${m.fck} / ${m.fyk} MPa` },
-      { symbole: 'l, N_Ed', libelle: 'longueur libre, effort normal', valeur: `${m.l} m ; ${m.NEd} kN` },
-      { symbole: 'phi(inf, t0)', libelle: `M_0Eqp / M_0Ed = ${m.rapport}`, valeur: String(m.phiInf) },
-      { symbole: 'methode', libelle: 'second ordre', valeur: m.methode },
-    ],
-    note: null,
-  };
 }
 
 document.addEventListener('click', (ev) => {
@@ -153,7 +135,7 @@ document.addEventListener('click', (ev) => {
     const svg = e.dessins[i];
     if (svg !== undefined) telecharger(`colonne-${i === 0 ? 'section' : 'interaction'}.svg`, svgAutonome(svg, STYLES_TRACE), 'image/svg+xml;charset=utf-8');
   } else if (action === 'exporter-resultats') {
-    telecharger('colonne-resultats.csv', resultatsEnCsv([entrees(e.modele), ...blocs(e.resultat)]), 'text/csv;charset=utf-8');
+    telecharger('colonne-resultats.csv', resultatsEnCsv(blocsEnTexte([blocEntrees(e.modele), ...blocs(e.resultat)])), 'text/csv;charset=utf-8');
   } else if (action === 'exporter-note') {
     ouvrirOuTelecharger(
       'colonne-note.html',
@@ -162,18 +144,11 @@ document.addEventListener('click', (ev) => {
           titre: `Poteau, N_Ed = ${e.modele.NEd} kN`,
           date: new Date().toISOString().slice(0, 10),
           profil: `${PROFIL.nom} (${PROFIL.date})`,
-          entrees: [entrees(e.modele)],
+          entrees: [blocEntrees(e.modele)],
           dessins: e.dessins,
           resultats: blocs(e.resultat),
           avertissements: e.resultat.avertissements,
-          hypotheses: [
-            'Element isole ; imperfection e_i = theta_i l_0 / 2 (§5.2(7)).',
-            'Moments d extremite majores de N e_i ; moment equivalent M_0e = 0,6 M_02 + 0,4 M_01 >= 0,4 M_02 (§5.8.8.2(2)).',
-            'Excentricite minimale e_0 = max(h/30 ; 20 mm) (§6.1(4)).',
-            'Section : loi parabole-rectangle, acier a palier horizontal, beton deplace par les barres deduit.',
-            'P-delta : barre biarticulee equivalente de longueur l_0, rigidite nominale EI.',
-            'Valeurs recommandees de l EN 1992-1-1 ; aucune annexe nationale codee.',
-          ],
+          hypotheses: HYPOTHESES_NOTE,
         },
         STYLES_TRACE
       )

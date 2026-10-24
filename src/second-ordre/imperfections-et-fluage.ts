@@ -62,7 +62,7 @@ export function fluageEffectif(
   const manques: string[] = [];
   if (phi_inf > 2) manques.push(`phi(inf, t0) = ${fr(phi_inf, 2)} > 2`);
   if (lambda > 75) manques.push(`lambda = ${fr(lambda, 1)} > 75`);
-  if (excentricite < h) manques.push(`M_0Ed / N_Ed = ${fr(excentricite, 0)} mm < h = ${fr(h, 0)} mm`);
+  if (excentricite < h) manques.push(`M_0Ed / N_Ed = ${fr(excentricite, 0)} mm, plus petit que h = ${fr(h, 0)} mm`);
   if (manques.length === 0) {
     return { phi_ef: 0, motif: 'fluage neglige : les trois conditions du §5.8.4(4) sont remplies' };
   }

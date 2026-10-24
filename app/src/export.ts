@@ -5,7 +5,17 @@
  * `aedificium-ui` (`telecharger`, `ouvrirOuTelecharger`).
  */
 
-import { JETONS, echapper, type BlocResultat } from 'aedificium-ui';
+import { JETONS, notationHtml, type BlocResultat } from 'aedificium-ui';
+
+/** Hypotheses et limites rappelees dans la note de calcul. */
+export const HYPOTHESES_NOTE: string[] = [
+  'Element isole ; imperfection e_i = theta_i l_0 / 2 (§5.2(7)).',
+  'Moments d extremite majores de N e_i ; moment equivalent M_0e = 0,6 M_02 + 0,4 M_01 >= 0,4 M_02 (§5.8.8.2(2)).',
+  'Excentricite minimale e_0 = max(h/30 ; 20 mm) (§6.1(4)).',
+  'Section : loi parabole-rectangle, acier a palier horizontal, beton deplace par les barres deduit.',
+  'P-delta : barre biarticulee equivalente de longueur l_0, rigidite nominale EI.',
+  'Valeurs recommandees de l EN 1992-1-1 ; aucune annexe nationale codee.',
+];
 
 /**
  * Styles du trace, jetons compris : un document exporte ne voit pas la
@@ -72,13 +82,13 @@ function tableDuBloc(bloc: BlocResultat): string {
   const lignes = bloc.lignes
     .map(
       (l) =>
-        `<tr><td class="sym">${echapper(l.symbole)}</td><td class="lib">${echapper(l.libelle)}</td><td class="val">${echapper(l.valeur)}</td></tr>`
+        `<tr><td class="sym">${notationHtml(l.symbole)}</td><td class="lib">${notationHtml(l.libelle)}</td><td class="val">${notationHtml(l.valeur)}</td></tr>`
     )
     .join('');
   const table = lignes === '' ? '' : `<table>${lignes}</table>`;
   // Le motif est rendu MEME sans ligne : c'est le cas ou il porte toute l'information.
-  const note = bloc.note === null ? '' : `<p class="note">${echapper(bloc.note)}</p>`;
-  return `<h3>${echapper(bloc.titre)}</h3>${table}${note}`;
+  const note = bloc.note === null ? '' : `<p class="note">${notationHtml(bloc.note)}</p>`;
+  return `<h3>${notationHtml(bloc.titre)}</h3>${table}${note}`;
 }
 
 /**
@@ -87,19 +97,19 @@ function tableDuBloc(bloc: BlocResultat): string {
  * coefficient non applicable.
  */
 export function noteDeCalculHtml(note: NoteDeCalcul, styles: string): string {
-  const avertissements = note.avertissements.map((a) => `<p class="avertissement">${echapper(a)}</p>`).join('');
+  const avertissements = note.avertissements.map((a) => `<p class="avertissement">${notationHtml(a)}</p>`).join('');
   const dessins = note.dessins.map((svg) => `<div class="dessin">${svg}</div>`).join('');
   const hypotheses =
     note.hypotheses.length === 0
       ? ''
-      : `<h2>Hypotheses et limites</h2><ul>${note.hypotheses.map((h) => `<li>${echapper(h)}</li>`).join('')}</ul>`;
+      : `<h2>Hypotheses et limites</h2><ul>${note.hypotheses.map((h) => `<li>${notationHtml(h)}</li>`).join('')}</ul>`;
   return `<!doctype html>
 <html lang="fr"><head><meta charset="utf-8" />
-<title>Note de calcul — ${echapper(note.titre)}</title>
+<title>Note de calcul — ${notationHtml(note.titre)}</title>
 <style>${styles}${STYLE_NOTE}</style></head>
 <body>
 <h1>Note de calcul — poteau en beton arme (EN 1992-1-1 §5.8, §6.1)</h1>
-<p class="date">${echapper(note.titre)} · ${echapper(note.date)} · profil : ${echapper(note.profil)}</p>
+<p class="date">${notationHtml(note.titre)} · ${notationHtml(note.date)} · profil : ${notationHtml(note.profil)}</p>
 ${avertissements}
 <h2>Donnees d entree</h2>${note.entrees.map(tableDuBloc).join('')}
 <h2>Section et diagramme d interaction</h2>${dessins}
