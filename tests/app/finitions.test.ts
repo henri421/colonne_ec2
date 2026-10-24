@@ -7,7 +7,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { NOMS_GRECS, blocsEnTexte, constatsAffichage, contenuBalise, resultatsEnCsv, texteVisible } from 'aedificium-ui';
+import { NOMS_GRECS, notationHtml, blocsEnTexte, constatsAffichage, contenuBalise, resultatsEnCsv, texteVisible } from 'aedificium-ui';
 import { beton, ec2Recommande, fyd, verifierColonne } from '../../src/index';
 import { donneesDepuisModele, modeleParDefaut, sectionDepuisModele, type ModeleSaisie } from '../../app/src/form';
 import { courbeInteraction, dessinInteraction, dessinSection } from '../../app/src/dessins';
@@ -97,9 +97,9 @@ describe('texte visible : notations, arrondis, accents, phrases types', () => {
     expect(controler('page', lire('../../app/index.html'))).toEqual([]);
   });
 
-  it('messages d erreur affiches', () => {
+  it('messages d erreur affiches (rendus par notationHtml, comme a l ecran)', () => {
     const m = messageDe(() => verifierColonne(poteau({ N_Ed: 0 }), P));
-    expect(constatsAffichage(texteVisible(m))).toEqual([]);
+    expect(constatsAffichage(texteVisible(notationHtml(m)))).toEqual([]);
   });
 
   it('CSV : texte brut, ni « _ » ni nom de lettre grecque ni balise', () => {
