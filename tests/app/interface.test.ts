@@ -40,7 +40,7 @@ describe('vues et dessins', () => {
   const r = verifierColonne(poteau(), P);
 
   it('les lignes disent si C est impose ou calcule', () => {
-    expect(lignesDirection(r.y).find((l) => l.symbole === 'C')?.libelle).toContain('calcule');
+    expect(lignesDirection(r.y).find((l) => l.symbole === 'C')?.libelle).toContain('calculé');
   });
 
   it('P-delta sans objet quand le second ordre est negligeable', () => {
@@ -77,7 +77,7 @@ describe('vues et dessins', () => {
 
   it('la note porte le titre du poteau', () => {
     const html = noteDeCalculHtml({ titre: 'P1', date: '2026-10-03', profil: P.nom, entrees: [], dessins: [], resultats: blocs(r), avertissements: [], hypotheses: [] }, STYLES_TRACE);
-    expect(html).toContain('poteau en beton arme');
+    expect(html).toContain('poteau en béton armé');
   });
 
   it('ecran et note portent le meme verdict : constat et N_Rd,max', () => {

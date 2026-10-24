@@ -22,7 +22,7 @@ describe('longueur efficace, §5.8.3.2', () => {
     // 0,5 x (1 + 0,1/0,55) = 0,5909
     const r = longueurEfficace({ mode: 'calculee', contreventement: 'contrevente', tete: { mode: 'encastre' }, pied: { mode: 'encastre' } }, 4000, P, av);
     expect(r.l0).toBeCloseTo(2363.64, 1);
-    expect(av.join(' ')).toContain('k = 0,10');
+    expect(av.join(' ')).toContain('k = 0,1');
   });
 
   it('non contrevente : console (pied k = 0,1, tete articulee) l_0 = 2,2 l', () => {
@@ -32,7 +32,7 @@ describe('longueur efficace, §5.8.3.2', () => {
   });
 
   it('non contrevente articule aux deux bouts : mecanisme, leve', () => {
-    expect(() => longueurEfficace({ mode: 'calculee', contreventement: 'non-contrevente', tete: { mode: 'articule' }, pied: { mode: 'articule' } }, 3000, P, [])).toThrow('mecanisme');
+    expect(() => longueurEfficace({ mode: 'calculee', contreventement: 'non-contrevente', tete: { mode: 'articule' }, pied: { mode: 'articule' } }, 3000, P, [])).toThrow('mécanisme');
   });
 
   it('souplesse sous le minimum : portee a 0,1 avec avertissement', () => {
