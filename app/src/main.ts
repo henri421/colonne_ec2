@@ -4,12 +4,13 @@
  * `dessins` et `export`, tous purs.
  */
 
-import { blocsEnTexte, nombreAffiche, notationTexte, ouvrirOuTelecharger, resultatsEnCsv, svgAutonome, telecharger } from 'aedificium-ui';
+import { blocsEnTexte, noteDeCalculHtml, notationTexte, ouvrirOuTelecharger, resultatsEnCsv, svgAutonome, telecharger } from 'aedificium-ui';
 import { beton, ec2Recommande, fyd, verifierColonne, type ResultatColonne } from '../../src/index';
 import { champsDepuisModele, donneesDepuisModele, modeleDepuisChamps, modeleParDefaut, sectionDepuisModele, type ModeleSaisie } from './form';
 import { courbeInteraction, dessinInteraction, dessinSection } from './dessins';
 import { avertissementsHtml, blocEntrees, blocs, lignesDevie, lignesDirection, lignesPDelta, messageDErreur, tableHtml, verdictHtml } from './vue';
-import { HYPOTHESES_NOTE, STYLES_TRACE, noteDeCalculHtml } from './export';
+import { STYLES_TRACE } from './export';
+import { noteDuCalcul } from './note';
 import './style.css';
 
 function exige<T extends Element>(selecteur: string): T {
@@ -21,6 +22,8 @@ function exige<T extends Element>(selecteur: string): T {
 const PROFIL = ec2Recommande();
 const formulaire = exige<HTMLFormElement>('#formulaire');
 const role = (nom: string): HTMLElement => exige<HTMLElement>(`[data-role="${nom}"]`);
+const champProjet = exige<HTMLInputElement>('[data-role="projet"]');
+const champElement = exige<HTMLInputElement>('[data-role="element"]');
 const zones = {
   erreurSaisie: role('erreur-saisie'),
   erreur: role('erreur'),
@@ -76,6 +79,25 @@ function ajusterLesGroupes(m: ModeleSaisie): void {
 function montrer(el: HTMLElement, message: string | null): void {
   el.textContent = message === null ? '' : notationTexte(message);
   el.hidden = message === null;
+}
+
+const CLE_CARTOUCHE = 'colonne-ec2:cartouche';
+
+/** Cartouche memorise ; un stockage absent ou illisible donne des champs vides. */
+function lireCartouche(): { projet: string; element: string } {
+  try {
+    const lu: unknown = JSON.parse(localStorage.getItem(CLE_CARTOUCHE) ?? '{}');
+    if (typeof lu === 'object' && lu !== null) {
+      const c = lu as Record<string, unknown>;
+      return {
+        projet: typeof c['projet'] === 'string' ? c['projet'] : '',
+        element: typeof c['element'] === 'string' ? c['element'] : '',
+      };
+    }
+  } catch {
+    // Rien de memorise, ou memoire refusee : cartouche vide.
+  }
+  return { projet: '', element: '' };
 }
 
 interface Etat {
@@ -140,19 +162,29 @@ document.addEventListener('click', (ev) => {
     ouvrirOuTelecharger(
       'colonne-note.html',
       noteDeCalculHtml(
-        {
-          titre: `Poteau, N_Ed = ${nombreAffiche(e.modele.NEd)} kN`,
-          date: new Date().toISOString().slice(0, 10),
-          profil: `${PROFIL.nom} (${PROFIL.date})`,
-          entrees: [blocEntrees(e.modele)],
-          dessins: e.dessins,
-          resultats: blocs(e.resultat),
-          avertissements: e.resultat.avertissements,
-          hypotheses: HYPOTHESES_NOTE,
-        },
+        noteDuCalcul(
+          PROFIL,
+          e.modele,
+          e.resultat,
+          { section: e.dessins[0] ?? '', interaction: e.dessins[1] ?? '' },
+          { projet: champProjet.value, element: champElement.value, date: new Date().toISOString().slice(0, 10) }
+        ),
         STYLES_TRACE
       )
     );
+  }
+});
+
+const memorise = lireCartouche();
+champProjet.value = memorise.projet;
+champElement.value = memorise.element;
+
+// Le cartouche vit hors du formulaire : le saisir ne relance pas le calcul.
+exige<HTMLElement>('#sorties').addEventListener('input', () => {
+  try {
+    localStorage.setItem(CLE_CARTOUCHE, JSON.stringify({ projet: champProjet.value, element: champElement.value }));
+  } catch {
+    // Memoire refusee : le cartouche reste valable pour la session.
   }
 });
 
