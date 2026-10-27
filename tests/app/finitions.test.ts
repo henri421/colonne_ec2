@@ -7,7 +7,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { NOMS_GRECS, notationHtml, blocsEnTexte, constatsAffichage, contenuBalise, resultatsEnCsv, texteVisible } from 'aedificium-ui';
+import { NOMS_GRECS, notationHtml, blocsEnTexte, constatsAffichage, contenuBalise, noteDeCalculHtml, resultatsEnCsv, texteVisible } from 'aedificium-ui';
 import { beton, ec2Recommande, fyd, verifierColonne } from '../../src/index';
 import { donneesDepuisModele, modeleParDefaut, sectionDepuisModele, type ModeleSaisie } from '../../app/src/form';
 import { courbeInteraction, dessinInteraction, dessinSection } from '../../app/src/dessins';
@@ -21,7 +21,8 @@ import {
   tableHtml,
   verdictHtml,
 } from '../../app/src/vue';
-import { HYPOTHESES_NOTE, STYLES_TRACE, noteDeCalculHtml } from '../../app/src/export';
+import { STYLES_TRACE } from '../../app/src/export';
+import { noteDuCalcul } from '../../app/src/note';
 import { poteau } from '../fixtures';
 
 const P = ec2Recommande();
@@ -58,7 +59,7 @@ function sorties() {
     const entrees = blocEntrees(m);
     notes.push(
       noteDeCalculHtml(
-        { titre: 'P1', date: '2026-10-24', profil: P.nom, entrees: [entrees], dessins, resultats: blocs(r), avertissements: r.avertissements, hypotheses: HYPOTHESES_NOTE },
+        noteDuCalcul(P, m, r, { section: dessins[0], interaction: dessins[1] }, { projet: 'Immeuble', element: '', date: '2026-10-24' }),
         STYLES_TRACE
       )
     );
@@ -138,7 +139,7 @@ describe('main.ts passe par les fonctions testees', () => {
     expect(main).not.toContain('class="alerte"');
     expect(main).toContain('avertissementsHtml(');
     expect(main).toContain('blocEntrees(');
-    expect(main).toContain('HYPOTHESES_NOTE');
+    expect(main).toContain('noteDuCalcul(');
     expect(main).toContain('blocsEnTexte(');
   });
 });

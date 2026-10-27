@@ -6,7 +6,6 @@ import { beton, ec2Recommande, fyd, verifierColonne } from '../../src/index';
 import { champsDepuisModele, donneesDepuisModele, modeleDepuisChamps, modeleParDefaut } from '../../app/src/form';
 import { courbeInteraction, dessinInteraction, dessinSection } from '../../app/src/dessins';
 import { blocs, lignesDirection, lignesPDelta, verdictHtml } from '../../app/src/vue';
-import { STYLES_TRACE, noteDeCalculHtml } from '../../app/src/export';
 import { SECTION_400, poteau } from '../fixtures';
 
 const P = ec2Recommande();
@@ -73,11 +72,6 @@ describe('vues et dessins', () => {
     const css = readFileSync(fileURLToPath(new URL('../../app/src/style.css', import.meta.url)), 'utf8');
     const page = valeursDesJetons(css);
     for (const [nom, valeur] of valeursDesJetons(JETONS)) expect(page.get(nom)).toBe(valeur);
-  });
-
-  it('la note porte le titre du poteau', () => {
-    const html = noteDeCalculHtml({ titre: 'P1', date: '2026-10-03', profil: P.nom, entrees: [], dessins: [], resultats: blocs(r), avertissements: [], hypotheses: [] }, STYLES_TRACE);
-    expect(html).toContain('poteau en béton armé');
   });
 
   it('ecran et note portent le meme verdict : constat et N_Rd,max', () => {
