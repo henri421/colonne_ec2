@@ -5,8 +5,9 @@
  * l_0 en m (plus naturel a saisir) ; efforts en kN, moments en kN.m.
  */
 
-import { lireNombre } from 'aedificium-ui';
+import { langueCourante, lireNombre } from 'aedificium-ui';
 import type { DonneesColonne, DonneesDirection, Maintien, Section } from '../../src/index';
+import { textes } from './textes';
 
 export type ModeMaintien = 'encastre' | 'articule' | 'souple';
 
@@ -95,13 +96,13 @@ class ErreurDeSaisie extends Error {}
 function choix<T extends string>(v: Record<string, string>, nom: string, permis: readonly T[]): T {
   const x = v[nom];
   if ((permis as readonly string[]).includes(x)) return x as T;
-  throw new ErreurDeSaisie('Valeur inattendue dans le formulaire.');
+  throw new ErreurDeSaisie(textes().messages.valeurInattendue);
 }
 
 function nombre(v: Record<string, string>, nom: string, requis: boolean, repli: number): number {
   const x = lireNombre(v[nom] ?? '');
   if (x === null) {
-    if (requis) throw new ErreurDeSaisie('Un nombre est attendu dans le formulaire.');
+    if (requis) throw new ErreurDeSaisie(textes().messages.nombreAttendu);
     return repli;
   }
   return x;
@@ -166,7 +167,7 @@ export function modeleDepuisChamps(v: Record<string, string>): Lecture {
 }
 
 export function champsDepuisModele(m: ModeleSaisie): Record<string, string> {
-  const n = (x: number): string => String(x).replace('.', ',');
+  const n = (x: number): string => String(x).replace('.', langueCourante() === 'en' ? '.' : ',');
   const dir = (p: 'y' | 'z', s: SaisieDirection): Record<string, string> => ({
     [`${p}_l0_mode`]: s.l0Mode,
     [`${p}_l0`]: n(s.l0),

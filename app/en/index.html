@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="theme-color" content="#f7f7f6" />
+    <link rel="icon" href="../icone.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="../icone-192.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reinforced concrete columns — buckling and second order, EN 1992-1-1 5.8</title>
+  </head>
+  <body>
+    <nav class="barre" aria-label="suite of tools">
+      <div class="barre-corps">
+        <span class="barre-nom">Aedificium &middot; Reinforced concrete</span>
+        <div class="barre-actions">
+          <a class="barre-lien" href="https://henri421.github.io/WebAedificium/" target="_blank" rel="noopener">Aedificium suite &#8599;</a>
+          <a class="barre-langue" href="../" hreflang="fr" lang="fr" aria-label="Version française">FR</a>
+        </div>
+      </div>
+    </nav>
+
+    <header>
+      <h1>Reinforced concrete columns</h1>
+      <p class="sous-titre">
+        Reinforced concrete column: buckling and second order effects (EN 1992-1-1 5.8, nominal curvature or nominal
+        stiffness), iterative P-&Delta; analysis, ULS resistance of the section and biaxial bending.
+      </p>
+      <p class="avertissement">
+        Recommended values, without National Annex. Isolated member; the global second order effects of a structure
+        are not covered.
+      </p>
+    </header>
+
+    <main>
+      <section id="saisie" aria-label="input">
+        <form id="formulaire" autocomplete="off">
+          <fieldset>
+            <legend>Section</legend>
+            <label><span>Shape</span>
+              <select data-champ="forme">
+                <option value="rectangulaire">rectangular</option>
+                <option value="circulaire">circular</option>
+              </select>
+            </label>
+            <div class="groupe" data-groupe="rectangulaire">
+              <label><span>b, along y (mm)</span><input type="text" inputmode="decimal" data-champ="b" /></label>
+              <label><span>h, along z (mm)</span><input type="text" inputmode="decimal" data-champ="h" /></label>
+              <label><span>Bars per face parallel to b</span><input type="text" inputmode="decimal" data-champ="nb" /></label>
+              <label><span>Bars per face parallel to h</span><input type="text" inputmode="decimal" data-champ="nh" /></label>
+            </div>
+            <div class="groupe" data-groupe="circulaire">
+              <label><span>D (mm)</span><input type="text" inputmode="decimal" data-champ="D" /></label>
+              <label><span>Number of bars</span><input type="text" inputmode="decimal" data-champ="n" /></label>
+            </div>
+            <label><span>&phi; of the bars (mm)</span><input type="text" inputmode="decimal" data-champ="phi" /></label>
+            <label><span>d', face to bar axis (mm)</span><input type="text" inputmode="decimal" data-champ="enrobage" /></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Materials and axial force</legend>
+            <label><span>f<sub>ck</sub> (MPa)</span><input type="text" inputmode="decimal" data-champ="fck" /></label>
+            <label><span>f<sub>yk</sub> (MPa)</span><input type="text" inputmode="decimal" data-champ="fyk" /></label>
+            <label><span>Clear length l (m)</span><input type="text" inputmode="decimal" data-champ="l" /></label>
+            <label><span>N<sub>Ed</sub>, compression (kN)</span><input type="text" inputmode="decimal" data-champ="ned" /></label>
+            <label><span>m, contributing members (5.2(5))</span><input type="text" inputmode="decimal" data-champ="m" /></label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Creep and method</legend>
+            <label><span>&phi;(&infin;, t<sub>0</sub>) (-)</span><input type="text" inputmode="decimal" data-champ="phi_inf" /></label>
+            <label><span>M<sub>0Eqp</sub> / M<sub>0Ed</sub> (-)</span><input type="text" inputmode="decimal" data-champ="rapport" /></label>
+            <label><span>Method</span>
+              <select data-champ="methode">
+                <option value="courbure-nominale">nominal curvature (5.8.8)</option>
+                <option value="rigidite-nominale">nominal stiffness (5.8.7)</option>
+              </select>
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Bending about y (dimension h)</legend>
+            <label><span>Effective length l<sub>0</sub></span>
+              <select data-champ="y_l0_mode">
+                <option value="calculee">calculated (5.8.3.2)</option>
+                <option value="saisie">entered</option>
+              </select>
+            </label>
+            <label><span>Member</span>
+              <select data-champ="y_contreventement">
+                <option value="contrevente">braced</option>
+                <option value="non-contrevente">unbraced</option>
+              </select>
+            </label>
+            <div class="groupe" data-groupe="y-l0-saisie">
+              <label><span>l<sub>0</sub> (m)</span><input type="text" inputmode="decimal" data-champ="y_l0" /></label>
+            </div>
+            <div class="groupe" data-groupe="y-l0-calculee">
+              <label><span>Top</span>
+                <select data-champ="y_tete">
+                  <option value="articule">pinned</option>
+                  <option value="encastre">fixed (k = 0.1)</option>
+                  <option value="souple">relative flexibility k entered</option>
+                </select>
+              </label>
+              <div class="groupe" data-groupe="y-k-tete">
+                <label><span>k top (-)</span><input type="text" inputmode="decimal" data-champ="y_k_tete" /></label>
+              </div>
+              <label><span>Bottom</span>
+                <select data-champ="y_pied">
+                  <option value="articule">pinned</option>
+                  <option value="encastre">fixed (k = 0.1)</option>
+                  <option value="souple">relative flexibility k entered</option>
+                </select>
+              </label>
+              <div class="groupe" data-groupe="y-k-pied">
+                <label><span>k bottom (-)</span><input type="text" inputmode="decimal" data-champ="y_k_pied" /></label>
+              </div>
+            </div>
+            <label><span>First order moments</span>
+              <select data-champ="y_origine">
+                <option value="extremites">end moments</option>
+                <option value="transversales">transverse loads</option>
+              </select>
+            </label>
+            <div class="groupe" data-groupe="y-extremites">
+              <label><span>M top (kN.m)</span><input type="text" inputmode="decimal" data-champ="y_m_tete" /></label>
+              <label><span>M bottom (kN.m), same sign = single curvature</span><input type="text" inputmode="decimal" data-champ="y_m_pied" /></label>
+            </div>
+            <div class="groupe" data-groupe="y-transversales">
+              <label><span>Maximum M<sub>0</sub> (kN.m)</span><input type="text" inputmode="decimal" data-champ="y_m0" /></label>
+              <label><span>Distribution</span>
+                <select data-champ="y_distribution">
+                  <option value="parabolique">parabolic (c0 = 9.6)</option>
+                  <option value="triangulaire">triangular (c0 = 12)</option>
+                  <option value="constante">constant (c0 = 8)</option>
+                </select>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Bending about z (dimension b)</legend>
+            <label><span>Effective length l<sub>0</sub></span>
+              <select data-champ="z_l0_mode">
+                <option value="calculee">calculated (5.8.3.2)</option>
+                <option value="saisie">entered</option>
+              </select>
+            </label>
+            <label><span>Member</span>
+              <select data-champ="z_contreventement">
+                <option value="contrevente">braced</option>
+                <option value="non-contrevente">unbraced</option>
+              </select>
+            </label>
+            <div class="groupe" data-groupe="z-l0-saisie">
+              <label><span>l<sub>0</sub> (m)</span><input type="text" inputmode="decimal" data-champ="z_l0" /></label>
+            </div>
+            <div class="groupe" data-groupe="z-l0-calculee">
+              <label><span>Top</span>
+                <select data-champ="z_tete">
+                  <option value="articule">pinned</option>
+                  <option value="encastre">fixed (k = 0.1)</option>
+                  <option value="souple">relative flexibility k entered</option>
+                </select>
+              </label>
+              <div class="groupe" data-groupe="z-k-tete">
+                <label><span>k top (-)</span><input type="text" inputmode="decimal" data-champ="z_k_tete" /></label>
+              </div>
+              <label><span>Bottom</span>
+                <select data-champ="z_pied">
+                  <option value="articule">pinned</option>
+                  <option value="encastre">fixed (k = 0.1)</option>
+                  <option value="souple">relative flexibility k entered</option>
+                </select>
+              </label>
+              <div class="groupe" data-groupe="z-k-pied">
+                <label><span>k bottom (-)</span><input type="text" inputmode="decimal" data-champ="z_k_pied" /></label>
+              </div>
+            </div>
+            <label><span>First order moments</span>
+              <select data-champ="z_origine">
+                <option value="extremites">end moments</option>
+                <option value="transversales">transverse loads</option>
+              </select>
+            </label>
+            <div class="groupe" data-groupe="z-extremites">
+              <label><span>M top (kN.m)</span><input type="text" inputmode="decimal" data-champ="z_m_tete" /></label>
+              <label><span>M bottom (kN.m), same sign = single curvature</span><input type="text" inputmode="decimal" data-champ="z_m_pied" /></label>
+            </div>
+            <div class="groupe" data-groupe="z-transversales">
+              <label><span>Maximum M<sub>0</sub> (kN.m)</span><input type="text" inputmode="decimal" data-champ="z_m0" /></label>
+              <label><span>Distribution</span>
+                <select data-champ="z_distribution">
+                  <option value="parabolique">parabolic (c0 = 9.6)</option>
+                  <option value="triangulaire">triangular (c0 = 12)</option>
+                  <option value="constante">constant (c0 = 8)</option>
+                </select>
+              </label>
+            </div>
+          </fieldset>
+
+          <p data-role="erreur-saisie" class="erreur" role="alert" hidden></p>
+        </form>
+      </section>
+
+      <div class="colonne">
+        <section id="resultat" aria-label="result">
+          <h2>Result</h2>
+          <p data-role="erreur" class="erreur" role="alert" hidden></p>
+          <div data-role="avertissements"></div>
+          <div data-role="verdict"></div>
+          <div class="dessins">
+            <div data-role="section"></div>
+            <div data-role="interaction"></div>
+          </div>
+        </section>
+
+        <section id="directions" aria-label="detail per direction">
+          <h2>Second order and section, per direction</h2>
+          <div class="deux">
+            <div><h3>About y (dimension h)</h3><div data-role="dir-y"></div></div>
+            <div><h3>About z (dimension b)</h3><div data-role="dir-z"></div></div>
+          </div>
+        </section>
+
+        <section id="pdelta" aria-label="P-delta analysis">
+          <h2>Iterative P-&Delta; analysis</h2>
+          <p class="note">Equivalent pin-ended member of length l<sub>0</sub>, nominal stiffness EI, first order moment M<sub>0Ed</sub>: the deflection is recalculated until it converges. A numerical cross-check of the simplified methods, not a structural analysis.</p>
+          <div class="deux">
+            <div><h3>About y</h3><div data-role="pd-y"></div></div>
+            <div><h3>About z</h3><div data-role="pd-z"></div></div>
+          </div>
+        </section>
+
+        <section id="devie" aria-label="biaxial bending">
+          <h2>Biaxial bending (5.8.9)</h2>
+          <div data-role="devie"></div>
+        </section>
+
+        <section id="sorties" aria-label="outputs">
+          <h2>Outputs</h2>
+          <label><span>Project</span><input type="text" data-role="projet" /></label>
+          <label><span>Element</span><input type="text" data-role="element" placeholder="empty = dimensions of the column" /></label>
+          <div class="boutons">
+            <button type="button" data-action="exporter-section">Section (SVG)</button>
+            <button type="button" data-action="exporter-interaction">N-M diagram (SVG)</button>
+            <button type="button" data-action="exporter-resultats">Results (CSV)</button>
+            <button type="button" data-action="exporter-note">Calculation note (printable HTML)</button>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      <p>
+        Out of scope: general method (5.8.6); global second order effects of structures (5.8.3.3); sections neither
+        rectangular nor circular; columns of variable section; prestressing; detailing of columns (9.5);
+        lateral-torsional buckling.
+      </p>
+    </footer>
+
+    <script type="module" src="../src/main.ts"></script>
+  </body>
+</html>

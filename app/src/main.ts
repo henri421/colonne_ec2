@@ -4,7 +4,7 @@
  * `dessins` et `export`, tous purs.
  */
 
-import { blocsEnTexte, noteDeCalculHtml, notationTexte, ouvrirOuTelecharger, resultatsEnCsv, svgAutonome, telecharger } from 'aedificium-ui';
+import { blocsEnTexte, definirLangue, langueDuDocument, noteDeCalculHtml, notationTexte, ouvrirOuTelecharger, resultatsEnCsv, svgAutonome, telecharger } from 'aedificium-ui';
 import { beton, ec2Recommande, fyd, verifierColonne, type ResultatColonne } from '../../src/index';
 import { champsDepuisModele, donneesDepuisModele, modeleDepuisChamps, modeleParDefaut, sectionDepuisModele, type ModeleSaisie } from './form';
 import { courbeInteraction, dessinInteraction, dessinSection } from './dessins';
@@ -12,6 +12,8 @@ import { avertissementsHtml, blocEntrees, blocs, lignesDevie, lignesDirection, l
 import { STYLES_TRACE } from './export';
 import { noteDuCalcul } from './note';
 import './style.css';
+
+definirLangue(langueDuDocument(document));
 
 function exige<T extends Element>(selecteur: string): T {
   const trouve = document.querySelector(selecteur);
