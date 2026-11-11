@@ -10,6 +10,7 @@ import type { ResultatColonne } from '../../src/index';
 import type { ModeleSaisie, ModeMaintien, SaisieDirection } from './form';
 import { blocEntrees, blocs } from './vue';
 import { phrase, textes } from './textes';
+import { VERSION_OUTIL } from './version';
 
 /** Hypotheses et limites, en francais (tests) ; la note lit `textes().note.hypotheses`. */
 export const HYPOTHESES_NOTE: string[] = textes().note.hypotheses;
@@ -80,6 +81,7 @@ export function noteDuCalcul(
 
   return {
     cartouche: {
+      version: VERSION_OUTIL,
       projet: cartouche.projet,
       element: cartouche.element.trim() === '' ? nomDuPoteau(m) : cartouche.element,
       date: cartouche.date,
