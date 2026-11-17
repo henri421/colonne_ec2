@@ -5,8 +5,9 @@
  * et le CSV (`blocEntrees`, `blocs`) ; elles ne sont ici que rangees.
  */
 
-import { nombreAffiche, type ElementNote, type LigneResultat, type NoteDeCalcul, type VerificationNote } from 'aedificium-ui';
-import type { ResultatColonne } from '../../src/index';
+import { avertissementAnnexeLu, libelleAnnexe, nombreAffiche, traduireSource, type ElementNote, type LigneResultat, type NoteDeCalcul, type VerificationNote } from 'aedificium-ui';
+import type { ProfilEc2, ResultatColonne } from '../../src/index';
+import { COEFS, SYMBOLES } from './annexe';
 import type { ModeleSaisie, ModeMaintien, SaisieDirection } from './form';
 import { blocEntrees, blocs } from './vue';
 import { phrase, textes } from './textes';
@@ -69,7 +70,7 @@ export function verificationsDeLaNote(r: ResultatColonne): VerificationNote[] {
  * qu'ils sont a l'ecran.
  */
 export function noteDuCalcul(
-  profil: { nom: string; date: string },
+  profil: ProfilEc2,
   m: ModeleSaisie,
   r: ResultatColonne,
   dessins: { section: string; interaction: string },
@@ -96,6 +97,10 @@ export function noteDuCalcul(
       materiaux: [bloc(t.materiaux, [materiaux])],
       hypotheses: [
         { type: 'texte', texte: t.profil(phrase(profil.nom), profil.date) },
+        bloc(
+          `${t.coefficients} : ${libelleAnnexe(m.annexe)}`,
+          COEFS.map((k) => L(SYMBOLES[k], `${t.libellesCoefs[k]} (${traduireSource(profil[k].source)})`, aff(profil[k].valeur, 4))),
+        ),
         bloc(t.secondOrdreFluage, [methode, fluage, L('m', t.elementsVerticaux, aff(m.m))]),
         { type: 'liste', items: t.hypotheses },
       ],
@@ -112,6 +117,6 @@ export function noteDuCalcul(
       ],
     },
     verifications: verificationsDeLaNote(r),
-    avertissements: r.avertissements.map(phrase),
+    avertissements: [...(m.annexe === 'lu' ? [avertissementAnnexeLu()].filter((a) => a !== '') : []), ...r.avertissements.map(phrase)],
   };
 }

@@ -94,7 +94,7 @@ describe('sections', () => {
   it('hypotheses : profil, methode, fluage, m, liste', () => {
     const h = calculer(DEFAUT).note.sections.hypotheses ?? [];
     expect(h.some((e) => e.type === 'texte' && e.texte.includes(P.nom))).toBe(true);
-    expect(symboles(h)).toEqual(['méthode', 'phi(inf, t0)', 'm']);
+    expect(symboles(h)).toEqual(['gamma_C', 'gamma_S', 'alpha_cc', 'gamma_cE', 'theta_0', 'k_min', 'c', 'méthode', 'phi(inf, t0)', 'm']);
     expect(h.flatMap((e) => (e.type === 'liste' ? [e.items] : []))).toEqual([HYPOTHESES_NOTE]);
   });
 

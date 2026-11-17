@@ -5,9 +5,10 @@
  * l_0 en m (plus naturel a saisir) ; efforts en kN, moments en kN.m.
  */
 
-import { langueCourante, lireNombre } from 'aedificium-ui';
+import { langueCourante, lireAnnexe, lireNombre, type AnnexeNationale } from 'aedificium-ui';
 import type { DonneesColonne, DonneesDirection, Maintien, Section } from '../../src/index';
 import { textes } from './textes';
+import { COEFS, coefsDeLAnnexe, type Coefs } from './annexe';
 
 export type ModeMaintien = 'encastre' | 'articule' | 'souple';
 
@@ -48,6 +49,10 @@ export interface ModeleSaisie {
   methode: 'courbure-nominale' | 'rigidite-nominale';
   y: SaisieDirection;
   z: SaisieDirection;
+  /** Annexe nationale choisie (lot E). */
+  annexe: AnnexeNationale;
+  /** Coefficients de l'annexe, preremplis et modifiables. */
+  coefs: Coefs;
 }
 
 export type Lecture = { ok: true; modele: ModeleSaisie } | { ok: false; message: string };
@@ -88,6 +93,8 @@ export function modeleParDefaut(): ModeleSaisie {
     methode: 'courbure-nominale',
     y: dir(60, -30),
     z: dir(20, 20),
+    annexe: 'recommande',
+    coefs: coefsDeLAnnexe('recommande'),
   };
 }
 
@@ -158,6 +165,8 @@ export function modeleDepuisChamps(v: Record<string, string>): Lecture {
         methode: choix(v, 'methode', ['courbure-nominale', 'rigidite-nominale'] as const),
         y: lireDirection(v, 'y', d.y),
         z: lireDirection(v, 'z', d.z),
+        annexe: lireAnnexe(v['annexe']),
+        coefs: Object.fromEntries(COEFS.map((k) => [k, nombre(v, `coef_${k}`, true, d.coefs[k])])) as Coefs,
       },
     };
   } catch (e) {
@@ -202,6 +211,8 @@ export function champsDepuisModele(m: ModeleSaisie): Record<string, string> {
     methode: m.methode,
     ...dir('y', m.y),
     ...dir('z', m.z),
+    annexe: m.annexe,
+    ...Object.fromEntries(COEFS.map((k) => [`coef_${k}`, n(m.coefs[k])])),
   };
 }
 

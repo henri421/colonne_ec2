@@ -4,9 +4,10 @@
  * `dessins` et `export`, tous purs.
  */
 
-import { brancherFeuilles, type BarreFeuilles, type Json } from 'aedificium-ui';
+import { avertissementAnnexeLu, brancherFeuilles, lireAnnexe, optionsAnnexe, type BarreFeuilles, type Json } from 'aedificium-ui';
 import { blocsEnTexte, definirLangue, langueDuDocument, noteDeCalculHtml, notationTexte, ouvrirOuTelecharger, resultatsEnCsv, svgAutonome, telecharger } from 'aedificium-ui';
-import { beton, ec2Recommande, fyd, verifierColonne, type ResultatColonne } from '../../src/index';
+import { beton, fyd, verifierColonne, type ProfilEc2, type ResultatColonne } from '../../src/index';
+import { coefsDeLAnnexe, profilDeCalcul } from './annexe';
 import { champsDepuisModele, donneesDepuisModele, modeleDepuisChamps, modeleParDefaut, sectionDepuisModele, type ModeleSaisie } from './form';
 import { courbeInteraction, dessinInteraction, dessinSection } from './dessins';
 import { avertissementsHtml, blocEntrees, blocs, lignesDevie, lignesDirection, lignesPDelta, messageDErreur, tableHtml, verdictHtml } from './vue';
@@ -22,7 +23,6 @@ function exige<T extends Element>(selecteur: string): T {
   return trouve as T;
 }
 
-const PROFIL = ec2Recommande();
 const formulaire = exige<HTMLFormElement>('#formulaire');
 const role = (nom: string): HTMLElement => exige<HTMLElement>(`[data-role="${nom}"]`);
 const champProjet = exige<HTMLInputElement>('[data-role="projet"]');
@@ -104,6 +104,7 @@ function lireCartouche(): { projet: string; element: string } {
 }
 
 interface Etat {
+  profil: ProfilEc2;
   modele: ModeleSaisie;
   resultat: ResultatColonne;
   dessins: string[];
@@ -129,6 +130,7 @@ function rafraichir(): void {
   const m = lecture.modele;
   ajusterLesGroupes(m);
   try {
+    const PROFIL = profilDeCalcul(m.annexe, m.coefs);
     const r = verifierColonne(donneesDepuisModele(m), PROFIL);
     const s = sectionDepuisModele(m);
     const b = beton(m.fck, PROFIL);
@@ -136,7 +138,8 @@ function rafraichir(): void {
     const svgSection = dessinSection(s);
     const svgInter = dessinInteraction({ y: courbeInteraction(s, b, f, 'y'), z: courbeInteraction(s, b, f, 'z') }, r);
     zones.verdict.innerHTML = verdictHtml(r);
-    zones.avertissements.innerHTML = avertissementsHtml(r.avertissements);
+    const annexe = m.annexe === 'lu' ? [avertissementAnnexeLu()].filter((a) => a !== '') : [];
+    zones.avertissements.innerHTML = avertissementsHtml([...annexe, ...r.avertissements]);
     zones.section.innerHTML = svgSection;
     zones.interaction.innerHTML = svgInter;
     zones.dirY.innerHTML = tableHtml(lignesDirection(r.y));
@@ -144,7 +147,7 @@ function rafraichir(): void {
     zones.pdY.innerHTML = tableHtml(lignesPDelta(r.y));
     zones.pdZ.innerHTML = tableHtml(lignesPDelta(r.z));
     zones.devie.innerHTML = tableHtml(lignesDevie(r));
-    etat = { modele: m, resultat: r, dessins: [svgSection, svgInter] };
+    etat = { profil: PROFIL, modele: m, resultat: r, dessins: [svgSection, svgInter] };
     montrer(zones.erreur, null);
   } catch (e) {
     montrer(zones.erreur, messageDErreur(e));
@@ -170,7 +173,7 @@ document.addEventListener('click', (ev) => {
       'colonne-note.html',
       noteDeCalculHtml(
         noteDuCalcul(
-          PROFIL,
+          e.profil,
           e.modele,
           e.resultat,
           { section: e.dessins[0] ?? '', interaction: e.dessins[1] ?? '' },
@@ -195,7 +198,18 @@ exige<HTMLElement>('#sorties').addEventListener('input', () => {
   }
 });
 
+exige<HTMLSelectElement>('[data-champ="annexe"]').innerHTML = optionsAnnexe('recommande');
 ecrireModele(modeleParDefaut());
+// Changer d'annexe repremplit ses coefficients ; chacun reste modifiable ensuite.
+formulaire.addEventListener('change', (ev) => {
+  const cible = ev.target;
+  if (!(cible instanceof HTMLSelectElement) || cible.dataset.champ !== 'annexe') return;
+  const coefs = coefsDeLAnnexe(lireAnnexe(cible.value));
+  for (const [k, x] of Object.entries(coefs)) {
+    const champ = formulaire.querySelector<HTMLInputElement>(`[data-champ="coef_${k}"]`);
+    if (champ !== null) champ.value = champsDepuisModele({ ...modeleParDefaut(), coefs })[`coef_${k}`] ?? String(x);
+  }
+});
 formulaire.addEventListener('input', rafraichir);
 formulaire.addEventListener('change', rafraichir);
 barre = brancherFeuilles({
@@ -204,8 +218,8 @@ barre = brancherFeuilles({
   conteneur: exige<HTMLElement>('[data-role="feuilles"]'),
   lire: () => valeursDesChamps() as Json,
   charger: (d) => {
-    if (d === null) ecrireModele(modeleParDefaut());
-    else {
+    ecrireModele(modeleParDefaut());
+    if (d !== null) {
       const v = d as Record<string, string>;
       for (const el of champs()) {
         const valeur = v[el.getAttribute('data-champ') ?? ''];
