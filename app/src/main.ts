@@ -5,7 +5,7 @@
  */
 
 import { avertissementAnnexeLu, brancherFeuilles, lireAnnexe, optionsAnnexe, type BarreFeuilles, type Json } from 'aedificium-ui';
-import { blocsEnTexte, definirLangue, langueDuDocument, noteDeCalculHtml, notationTexte, ouvrirOuTelecharger, resultatsEnCsv, svgAutonome, telecharger } from 'aedificium-ui';
+import { blocsEnTexte, definirLangue, langueDuDocument, noteDeCalculHtml, notationTexte, ouvrirOuTelecharger, resultatsEnCsv, svgAutonome, telecharger, telechargerNotePdf } from 'aedificium-ui';
 import { beton, fyd, verifierColonne, type ProfilEc2, type ResultatColonne } from '../../src/index';
 import { coefsDeLAnnexe, profilDeCalcul } from './annexe';
 import { champsDepuisModele, donneesDepuisModele, modeleDepuisChamps, modeleParDefaut, sectionDepuisModele, type ModeleSaisie } from './form';
@@ -168,20 +168,19 @@ document.addEventListener('click', (ev) => {
     if (svg !== undefined) telecharger(`colonne-${i === 0 ? 'section' : 'interaction'}.svg`, svgAutonome(svg, STYLES_TRACE), 'image/svg+xml;charset=utf-8');
   } else if (action === 'exporter-resultats') {
     telecharger('colonne-resultats.csv', resultatsEnCsv(blocsEnTexte([blocEntrees(e.modele), ...blocs(e.resultat)])), 'text/csv;charset=utf-8');
-  } else if (action === 'exporter-note') {
-    ouvrirOuTelecharger(
-      'colonne-note.html',
-      noteDeCalculHtml(
-        noteDuCalcul(
-          e.profil,
-          e.modele,
-          e.resultat,
-          { section: e.dessins[0] ?? '', interaction: e.dessins[1] ?? '' },
-          { projet: champProjet.value, element: champElement.value, date: new Date().toISOString().slice(0, 10) }
-        ),
-        STYLES_TRACE
-      )
+  } else if (action === 'exporter-note' || action === 'exporter-note-pdf') {
+    const note = noteDuCalcul(
+      e.profil,
+      e.modele,
+      e.resultat,
+      { section: e.dessins[0] ?? '', interaction: e.dessins[1] ?? '' },
+      { projet: champProjet.value, element: champElement.value, date: new Date().toISOString().slice(0, 10) }
     );
+    if (action === 'exporter-note') ouvrirOuTelecharger('colonne-note.html', noteDeCalculHtml(note, STYLES_TRACE));
+    else {
+      cible.setAttribute('aria-busy', 'true');
+      void telechargerNotePdf('colonne-note.pdf', note, STYLES_TRACE).finally(() => cible.removeAttribute('aria-busy'));
+    }
   }
 });
 
